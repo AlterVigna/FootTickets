@@ -1,0 +1,55 @@
+<html lang="en">
+   <head>
+	<title>FooTicket - Authentication </title>
+
+	<th:block th:include="fragments/commonResources :: commons"></th:block>
+	<link rel="stylesheet" href="/css/login.css">
+	<script src="/script/login.js"></script>
+
+   </head>
+
+   <body>
+		<h1 class="titleStyleLogin"> FooTicket </h1>
+		<h1 class="titleForm"> Log In </h1>
+
+		<div class="login-page">
+		  <div class="form">
+			<!-- SIGN IN FORM -->
+			<form class="register-form" method='POST' th:action="@{/signIn}" th:object="${account}">
+			  <input type="text" placeholder="username" th:field="${account.username}"/>
+			  <input type="password" placeholder="password" th:field="${account.password}" />
+			  <div class="divTypeUser">
+				  <label class="radio-inline">
+					<input type="radio" th:field="${account.type}" value="A" >
+						<span> Administrator </span>
+				  </label>
+				  <label class="radio-inline">
+					<input type="radio" th:field="${account.type}" value="B">
+					<span> Buyer </span>
+				  </label>
+			  </div>
+			  <button>create</button>
+			  <p class="message" >Already registered? <a href="#" fun="reg">Log In</a></p>
+			</form>
+
+			<!-- LOG IN FORM -->
+			<form class="login-form" name='f' action="login" method='POST'>
+				  <input type="text" name="username" placeholder="username"/>
+				  <input type="password" name="password" placeholder="password"/>
+
+				  <span class="credentialErrors" th:if="${param.credentialError}">
+					  Credentials are not correct. Please try again!
+				  </span>
+				  <button>login</button>
+				  <p class="message" >Not registered? <a href="#" fun="log">Create an account</a></p>
+
+				  <span class="messInfo msgRegOk" th:if="${param.registrationOk!=null && param.registrationOk}">
+					  Registration successful!
+				  </span>
+				  <span class="messInfo msgRegErr" th:if="${param.registrationOk!=null && !param.registrationOk}">
+					  Registration Failed!
+				  </span>
+			  </form>
+		  </div>
+		</div>
+	</body>

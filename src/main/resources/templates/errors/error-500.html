@@ -1,0 +1,48 @@
+<html lang="en">
+<head>
+	<title>FooTicket - Internal Server Error </title>
+	<th:block th:include="fragments/commonResources :: commons"></th:block>
+	<link rel="stylesheet" th:href="@{/css/errors.css}">
+	<script th:src="@{/script/error.js}"></script>
+</head>
+
+<body>
+<div th:replace="fragments/accountInfo :: myHeader"></div>
+<h2 class="titleStyle"> An Error Occurred</h2>
+<h3 class="subTitleIconStyle"> <i class="fas fa-exclamation-triangle"></i> </h3>
+<h4 class="iconInfoStyle"><i class="fas fa-plus-square buttonDetails "  title="Show details"></i></h4>
+<table class="tableErrorDetails" style="display: none;">
+	<tr>
+		<td><B>Date</B></td>
+		<td th:text="${timestamp}"/>
+	</tr>
+	<tr>
+		<td><B>Path</B></td>
+		<td th:text="${path}"/>
+	</tr>
+	<tr>
+		<td><B>Status</B></td>
+		<td th:text="${status}"/>
+	</tr>
+	<tr>
+		<td><B>Message</B></td>
+		<td th:text="${message}"/>
+	</tr>
+	<tr>
+		<td><B>Exception</B></td>
+		<td th:text="${exception}"/>
+	</tr>
+	<tr>
+		<td><B>Trace</B></td>
+		<td>
+			<pre th:text="${trace}"/>
+		</td>
+	</tr>
+</table>
+
+<h2 class="subTitleStyle"> Click here to be redirected to <a href="/">home</a> </h2>
+
+
+</body>
+
+</html>

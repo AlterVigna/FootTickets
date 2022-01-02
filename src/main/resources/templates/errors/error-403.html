@@ -1,0 +1,19 @@
+<html lang="en">
+<head>
+	<title>FooTicket - Forbidden </title>
+	<th:block th:include="fragments/commonResources :: commons"></th:block>
+	<script th:src="@{/script/redirectEffect.js}"></script>
+</head>
+
+<body>
+
+<div th:replace="fragments/accountInfo :: myHeader"></div>
+
+<h2 class="titleStyle"> Access Denied </h2>
+<h3 class="subTitleIconStyle"> <i class="fas fa-user-lock"></i> </h3>
+<h4 class="subTitleStyle"> You will be redirect to <a href="/">home</a> in the following seconds . . . </h4>
+
+
+</body>
+
+</html>

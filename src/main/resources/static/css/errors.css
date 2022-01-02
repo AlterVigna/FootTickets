@@ -1,0 +1,24 @@
+
+.iconInfoStyle{
+    text-align: center;
+    font-family: 'Righteous', cursive;
+    font-size: 22px;
+}
+
+.buttonDetails{
+    cursor: pointer;
+}
+
+.tableErrorDetails{
+    border: 2px solid black;
+    width: 100%;
+    background: #ffffff99;
+}
+
+.th{
+    font-size: larger;
+}
+
+.tableErrorDetails,th,td{
+    border: 2px solid black;
+}

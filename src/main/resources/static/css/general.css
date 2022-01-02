@@ -1,0 +1,69 @@
+
+.titleStyle{
+	text-align: center;
+	font-family: 'Righteous', cursive;
+	font-size: 46px;
+}
+
+.subTitleStyle{
+	text-align: center;
+	font-family: 'Righteous', cursive;
+	font-size: 20px;
+
+}
+
+.subTitleIconStyle{
+	text-align: center;
+	font-family: 'Righteous', cursive;
+	font-size: 46px;
+}
+
+
+
+body {
+	background: #76b852; /* fallback for old browsers */
+	background: -webkit-linear-gradient(right, #76b852, #8DC26F);
+	background: -moz-linear-gradient(right, #76b852, #8DC26F);
+	background: -o-linear-gradient(right, #76b852, #8DC26F);
+	background: linear-gradient(to left, #76b852, #8DC26F);
+	font-family: "Roboto", sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	margin: 25px;
+}
+
+.formInfoUser{
+
+	position: relative;
+	z-index: 1;
+	background: #FFFFFF;
+	max-width: 375px;
+	padding: 25px;
+	text-align: right;
+	box-shadow: 0 0 20px 0 rgb(0 0 0 / 20%), 0 5px 5px 0 rgb(0 0 0 / 24%);
+	left: 75%;
+	top: -100px;
+}
+
+.formInfoUser button {
+	font-family: "Roboto", sans-serif;
+	text-transform: uppercase;
+	outline: 0;
+	background: #cf0b0bf2;
+	/* width: 100%; */
+	border: 0;
+	padding: 7px;
+	color: #FFFFFF;
+	font-size: 14px;
+	-webkit-transition: all 0.3 ease;
+	transition: all 0.3 ease;
+	cursor: pointer;
+
+}
+
+.inlineBlocks{
+	display: inline;
+	font-size: 22px;
+	font-weight: 700;
+	margin-right: 25px;
+}

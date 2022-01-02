@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>FooTicket - Home </title>
+    <th:block th:include="fragments/commonResources :: commons"></th:block>
+
+</head>
+
+<body>
+<div th:replace="fragments/accountInfo :: myHeader"></div>
+
+<h1> Hello world Admin</h1>
+
+Role: <span th:text="${session.current_user.getType()}"></span>
+
+</body>
+</html>

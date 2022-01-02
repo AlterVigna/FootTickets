@@ -1,0 +1,23 @@
+<html lang="en">
+<head>
+	<title>FooTicket - Not Found </title>
+
+	<th:block th:include="fragments/commonResources :: commons"></th:block>
+	<link rel="stylesheet" th:href="@{/css/errors.css}">
+	<script th:src="@{/script/redirectEffect.js}"></script>
+</head>
+
+<body>
+
+<div th:replace="fragments/accountInfo :: myHeader"></div>
+
+<h2 class="titleStyle"> Resource Not Found </h2>
+<h3 class="subTitleIconStyle"> <i class="fas fa-angry"></i> </h3>
+<h4 class="subTitleStyle"> You will be redirect to <a href="/">home</a> in the following seconds . . . </h4>
+
+
+</body>
+
+
+
+</html>

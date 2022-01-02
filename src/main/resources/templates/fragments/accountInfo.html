@@ -1,0 +1,30 @@
+<html lang="en">
+<head>
+</head>
+
+<body>
+    <div th:fragment="myHeader">
+        <h1 class="titleStyle"> FooTicket </h1>
+
+        <form class="formInfoUser" action="/logout" method="post" th:if="${session.current_user!=null}">
+            <div class="inlineBlocks" >
+                <i class="fas fa-user" title="User"></i> &nbsp;
+                <span th:text="${session.current_user.getUsername()}"></span>
+            </div>
+            <div class="inlineBlocks">
+                <span th:if="${session.current_user.getType()=='A'}">
+                    <i class="fas fa-user-shield" title="Administrator"></i> ADMIN
+                </span>
+                <span th:if="${session.current_user.getType()=='B'}">
+                    <span th:text="${session.current_user.getAmount()}"></span>
+                    <i class="fas fa-euro-sign"></i>
+                </span>
+
+            </div>
+            <div class="inlineBlocks">
+                <button>LOGOUT</button>
+            </div>
+        </form>
+    </div>
+</body>
+
