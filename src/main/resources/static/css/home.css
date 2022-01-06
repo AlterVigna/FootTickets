@@ -1,0 +1,49 @@
+
+.divHomeButtons{
+    text-align: center;
+
+}
+
+.buttonFunctionality{
+    margin: 20px;
+    font-weight: bold;
+    border: 3px solid black;
+    font-family: "Roboto", sans-serif;
+    cursor: pointer;
+    -webkit-transition: all 0.3 ease;
+    transition: all 0.3 ease;
+    font-size: 22px;
+    padding: 7px;
+    text-transform: uppercase;
+    outline: 0;
+    color: #FFFFFF;
+    /* width: 100%; */
+
+}
+
+.buttonFunctionality,a{
+    text-decoration: none;
+    color: white;
+}
+
+.buttonViewMap{
+    background: rgba(11, 76, 207, 0.95);
+}
+
+.buttonViewTickets{
+    background: rgba(239, 195, 61, 0.95);
+}
+
+.buttonCreateMap{
+    background: rgba(231, 101, 6, 0.95);
+}
+
+.buttonViewMapAdmin{
+    background: rgba(100, 12, 210, 0.95);
+}
+
+
+.buttonBack a {
+    text-decoration: none;
+    color: black !important;
+}

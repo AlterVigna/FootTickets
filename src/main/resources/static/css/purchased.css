@@ -1,0 +1,18 @@
+
+.tablePurchased{
+    border: 2px solid black;
+    width: 100%;
+    background: #ffffff;
+    text-align: center;
+    /* border: 2px solid; */
+    border-collapse: collapse;
+
+}
+
+th{
+    font-size: larger;
+}
+
+.tablePurchased, th, td {
+    border: 2px solid black;
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>FooTicket - Purchased Tickets </title>
+    <th:block th:include="fragments/commonResources :: commons"></th:block>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" th:href="@{/css/purchased.css}">
+</head>
+
+<body>
+
+<div th:replace="fragments/accountInfo :: myHeader"></div>
+
+<h1> Purchased Tickets</h1>
+
+<table class="tablePurchased" >
+    <thead>
+        <th>Id</th>
+        <th>Num Seats</th>
+        <th>Location</th>
+        <th>Price</th>
+        <th>Timestamp</th>
+    </thead>
+    <tbody>
+        <tr th:each="tran: ${listTransactions}">
+            <td th:text="${tran.id}" />
+            <td th:text="${tran.numSeats}"/>
+            <td th:text="${tran.location}"/>
+            <td th:text="${tran.price}"/>
+            <td th:text="${tran.timestamp}"/>
+        </tr>
+    </tbody>
+</table>
+
+<div class="divHomeButtons">
+    <button class="buttonFunctionality buttonBack"><a th:href="@{/buyer}"> BACK </a> </button>
+</div>
+
+</body>
+</html>
