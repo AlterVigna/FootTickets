@@ -67,3 +67,33 @@ body {
 	font-weight: 700;
 	margin-right: 25px;
 }
+
+.buttonFunctionality{
+	margin: 20px;
+	font-weight: bold;
+	border: 3px solid black;
+	font-family: "Roboto", sans-serif;
+	cursor: pointer;
+	-webkit-transition: all 0.3 ease;
+	transition: all 0.3 ease;
+	font-size: 22px;
+	padding: 7px;
+	text-transform: uppercase;
+	outline: 0;
+	color: #FFFFFF;
+	/* width: 100%; */
+
+}
+
+.buttonFunctionality,a{
+	text-decoration: none;
+	color: white;
+}
+
+.buttonBack a {
+	text-decoration: none;
+	color: black !important;
+}
+.divButtons{
+	text-align: center;
+}

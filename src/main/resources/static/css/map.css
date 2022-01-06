@@ -1,0 +1,58 @@
+#mainTable {
+    border-spacing: 20px;
+    border: 2px solid black;
+    margin-top: 20px;
+}
+
+#mainTable td, th {
+    width: 4rem;
+    height: 2rem;
+    border: 1px solid #ccc;
+    text-align: center;
+    font-weight: 700;
+}
+#mainTable th {
+    background: lightblue;
+    border-color: white;
+}
+
+
+.selected{
+    background: yellow;
+}
+
+.container {
+    display: inline;
+}
+
+.inputNumber{
+    width: 40px;
+}
+
+.sectionNumber1{
+    margin: 2px;
+
+}
+.tableSelection{
+    border-collapse: collapse;
+    font-size: 20px;
+}
+th{
+    font-size: larger;
+}
+
+.tableSelection, th, td {
+    border: 2px solid black;
+    text-align: center;
+}
+
+.tableButton{
+    margin: 7px !important;
+    font-size: 16px !important;
+    color: black !important;
+}
+.tableButton ,a{
+    margin: 7px !important;
+    font-size: 16px !important;
+    color: black !important;
+}

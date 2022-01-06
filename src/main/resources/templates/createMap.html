@@ -3,16 +3,45 @@
 <head>
     <title>FooTicket - Create Map </title>
     <th:block th:include="fragments/commonResources :: commons"></th:block>
-
+    <link rel="stylesheet" th:href="@{/css/map.css}">
+    <script th:src="@{/script/map.js}"></script>
 </head>
 
 <body>
 
     <div th:replace="fragments/accountInfo :: myHeader"></div>
 
-    TODO
+    <h1> Create new seats map </h1>
+    <div>
+
+        <table class="tableSelection">
+            <tr>
+                <td> Rows x Columns </td>
+                <td> <input id="numRow" type="number" name="file" min="1" class="inputNumber"> x <input id="numCol"type="number"  min="1" class="inputNumber"></td>
+            </tr>
+            <tr>
+                <td> Price per seat</td>
+                <td> <input id="price" type="number" name="price" min="1" value="50" class="inputNumber"></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <button class="buttonFunctionality buttonBack tableButton"><a th:href="@{/admin}"> BACK </a> </button>
+                    <button id="createMapButton" class="buttonFunctionality tableButton" > DRAW  </button>
+                    <button id="confirmMap" class="buttonFunctionality tableButton" style="display: none;"><a th:href="@{/admin}"> CREATE </a> </button>
+                </td>
+            </tr>
+
+        </table>
+    </div>
+
+    <div class="container">
+        <table id="mainTable"></table>
+    </div>
 
 
 
 </body>
+
+
+
 </html>
