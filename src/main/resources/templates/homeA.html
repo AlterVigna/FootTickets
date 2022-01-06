@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>FooTicket - Home </title>
+    <th:block th:include="fragments/commonResources :: commons"></th:block>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+
+<body>
+<div th:replace="fragments/accountInfo :: myHeader"></div>
+
+<h1> Hello Admin</h1>
+
+<div class="divHomeButtons">
+    <button class="buttonFunctionality buttonCreateMap"><a th:href="@{/admin/createMap}"> Create New Map </a> </button>
+    <button class="buttonFunctionality buttonViewMapAdmin"><a> View Current Map </a></button>
+</div>
+
+
+</body>
+</html>

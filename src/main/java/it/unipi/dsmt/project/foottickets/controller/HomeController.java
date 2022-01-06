@@ -33,7 +33,6 @@ public class HomeController {
     public String index(HttpServletRequest request, Authentication authentication) {
 
         if (authentication!=null && authentication.isAuthenticated()){
-
             Account current_user= (Account) request.getSession().getAttribute(KEY_CURRENT_USER);
             if (CODE_ROLE_ADMIN.equals(current_user.getType())){
                 return "redirect:"+HOME_ADMIN;
@@ -44,22 +43,6 @@ public class HomeController {
         }
         return "redirect:"+LOGIN_CALL;
     }
-
-
-    @RequestMapping("/buyer")
-    public String buyer(HttpServletRequest request, Principal principal){
-        Optional<Account> user = accountService.findByUsername(principal.getName());
-        request.getSession().setAttribute(KEY_CURRENT_USER,user.get());
-        return HOME_BUYER_PAGE;
-    }
-
-    @RequestMapping("/admin")
-    public String admin(HttpServletRequest request, Principal principal){
-        Optional<Account> user = accountService.findByUsername(principal.getName());
-        request.getSession().setAttribute(KEY_CURRENT_USER,user.get());
-        return HOME_BUYER_PAGE;
-    }
-
 
     @PostMapping(value = "/signIn")
     public String signIn(HttpServletRequest request, @ModelAttribute("account") Account account){
@@ -75,7 +58,6 @@ public class HomeController {
         return "redirect:"+LOGIN_CALL+"?registrationOk="+esit;
     }
 
-
     @RequestMapping("/login")
     public String login(Model model){
         Account account = new Account();
@@ -83,9 +65,5 @@ public class HomeController {
         model.addAttribute("account",account);
         return LOGIN_PAGE;
     }
-
-
-
-
 
 }

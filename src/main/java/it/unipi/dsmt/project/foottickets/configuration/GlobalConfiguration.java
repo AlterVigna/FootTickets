@@ -7,8 +7,10 @@ public class GlobalConfiguration {
     public static final String ERROR_404="errors/error-404";
     public static final String ERROR_500="errors/error-500";
     public static final String LOGIN_PAGE="login";
-    public static final String HOME_ADMIN_PAGE="indexA";
-    public static final String HOME_BUYER_PAGE="indexB";
+    public static final String HOME_ADMIN_PAGE="homeA";
+    public static final String HOME_BUYER_PAGE="homeB";
+    public static final String VIEW_PURCHASED_PAGE="viewPurchased";
+    public static final String CREATE_MAP_VIEW="createMap";
 
     // Paths for calling controller methods
     public static final String LOGIN_CALL="/login";

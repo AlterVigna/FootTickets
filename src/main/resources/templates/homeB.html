@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>FooTicket - Home </title>
+    <th:block th:include="fragments/commonResources :: commons"></th:block>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+
+<body>
+
+<div th:replace="fragments/accountInfo :: myHeader"></div>
+
+<h1> Hello buyer</h1>
+
+<div class="divHomeButtons">
+    <button class="buttonFunctionality buttonViewMap"><a> View Seats Map </a> </button>
+    <button class="buttonFunctionality buttonViewTickets"><a th:href="@{/buyer/viewPurchased}"> View Purchased </a></button>
+</div>
+
+</body>
+</html>
