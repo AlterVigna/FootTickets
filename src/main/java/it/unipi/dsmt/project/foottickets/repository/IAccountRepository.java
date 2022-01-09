@@ -1,7 +1,6 @@
 package it.unipi.dsmt.project.foottickets.repository;
 
 import it.unipi.dsmt.project.foottickets.model.Account;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
@@ -11,9 +10,8 @@ import java.util.Optional;
 // The implementation class of the above methods will be created by Spring at runtime automatically.
 // See this link for more details https://www.concretepage.com/spring-5/spring-data-crudrepository-example
 // Jpa Repository extends basic CRUD repository
-public interface IAccountRepository extends JpaRepository<Account,String> {
+public interface IAccountRepository extends CrudRepository<Account,String> {
 
     public Optional<Account> findAccountByUsername(String username);
-
 
 }

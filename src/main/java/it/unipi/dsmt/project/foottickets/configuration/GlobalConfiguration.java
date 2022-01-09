@@ -11,6 +11,8 @@ public class GlobalConfiguration {
     public static final String HOME_BUYER_PAGE="homeB";
     public static final String VIEW_PURCHASED_PAGE="viewPurchased";
     public static final String CREATE_MAP_VIEW="createMap";
+    public static final String VIEW_MAP_VIEW="viewMap";
+    public static final String BUY_TICKET_VIEW="buyTicket";
 
     // Paths for calling controller methods
     public static final String LOGIN_CALL="/login";
@@ -29,10 +31,15 @@ public class GlobalConfiguration {
 
     // Session Keyword
     public static final String KEY_CURRENT_USER="current_user";
+    public static final String KEY_SELECTED_SEATS="selected_seats";
+    public static final String KEY_SEAT_COST="seat_cost";
 
 
     // Other parameter
     public static final Double DEFAULT_NEW_AMOUNT=500.00;
     public static final String WRONG_PASSWORD="§§§__WRONG__PASSWORD__4SURE__§§";
+
+    public static int POSITIVE_ANSWER=1;
+    public static int NEGATIVE_ANSWER=0;
 
 }

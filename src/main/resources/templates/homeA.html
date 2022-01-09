@@ -10,10 +10,15 @@
 <div th:replace="fragments/accountInfo :: myHeader"></div>
 
 <h1> Hello Admin</h1>
-
+<span class="positiveMessage" th:if="${param.mapCreated!=null and param.mapCreated}">
+       The map has been created successfully!
+</span>
+<span class="negativeMessage" th:if="${param.mapCreated!=null and not param.mapCreated}">
+       Somethings goes wrong during the creation of the map!
+</span>
 <div class="divButtons">
     <button class="buttonFunctionality buttonCreateMap"><a th:href="@{/admin/createMap}"> Create New Map </a> </button>
-    <button class="buttonFunctionality buttonViewMapAdmin"><a> View Current Map </a></button>
+    <button class="buttonFunctionality buttonViewMapAdmin"><a th:href="@{/admin/viewMap}"> View Current Map </a></button>
 </div>
 
 

@@ -27,6 +27,7 @@
 
 .inputNumber{
     width: 40px;
+    margin: 3px;
 }
 
 .sectionNumber1{
@@ -36,6 +37,7 @@
 .tableSelection{
     border-collapse: collapse;
     font-size: 20px;
+    margin-top: 20px;
 }
 th{
     font-size: larger;
@@ -44,6 +46,7 @@ th{
 .tableSelection, th, td {
     border: 2px solid black;
     text-align: center;
+    font-weight: bolder;
 }
 
 .tableButton{
@@ -55,4 +58,17 @@ th{
     margin: 7px !important;
     font-size: 16px !important;
     color: black !important;
+}
+
+
+.locked{
+    background: #ff000099;
+
+}
+
+.reserved{
+    background: rgba(19, 255, 0, 0.6);
+}
+.negativeMessage{
+    color:red;
 }

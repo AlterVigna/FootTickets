@@ -21,7 +21,7 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    public boolean saveAccount(Account account) {
+    public boolean saveNewAccount(Account account) {
 
         if (account!=null){
 
@@ -34,9 +34,5 @@ public class AccountService implements IAccountService {
         }
         return false;
     }
-
-
-
-
 
 }

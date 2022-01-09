@@ -1,8 +1,6 @@
 package it.unipi.dsmt.project.foottickets.repository;
 
-import it.unipi.dsmt.project.foottickets.model.Account;
 import it.unipi.dsmt.project.foottickets.model.Transaction;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
@@ -16,7 +14,6 @@ public interface ITransactionRepository extends CrudRepository<Transaction,Integ
     // ORDER BY TIMESTAMP DESC
     // LIMIT 10
     public List<Transaction> findTop10ByAccount_UsernameOrderByTimestampDesc(String account);
-    public List<Transaction> findAllById(Long id);
 
 
 }

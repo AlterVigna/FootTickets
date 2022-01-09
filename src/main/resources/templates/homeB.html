@@ -12,8 +12,12 @@
 
 <h1> Hello buyer</h1>
 
+<span class="positiveMessage" th:if="${param.purchasedTicket!=null and param.purchasedTicket}">
+    Congratulation! You have successfully purchased a ticket.
+</span>
+
 <div class="divButtons">
-    <button class="buttonFunctionality buttonViewMap"><a> View Seats Map </a> </button>
+    <button class="buttonFunctionality buttonViewMap"><a th:href="@{/buyer/buyTicket}"> View Seats Map </a> </button>
     <button class="buttonFunctionality buttonViewTickets"><a th:href="@{/buyer/viewPurchased}"> View Purchased </a></button>
 </div>
 

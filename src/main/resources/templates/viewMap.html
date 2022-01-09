@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>FooTicket - View Map </title>
+    <th:block th:include="fragments/commonResources :: commons"></th:block>
+    <link rel="stylesheet" th:href="@{/css/map.css}">
+    <script th:src="@{/script/map.js}"></script>
+</head>
+
+<body>
+
+    <div th:replace="fragments/accountInfo :: myHeader"></div>
+
+    <h1> View seats map </h1>
+    <div>
+
+            <table class="tableSelection">
+                <tr>
+                    <td> Rows x Columns </td>
+                    <td>   <span class="numRows"></span> x <span class="numCols"></span> </td>
+                </tr>
+                <tr>
+                    <td> Price per seat </td>
+                    <td> <span class="price"></span></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button class="buttonFunctionality buttonBack tableButton" type="button"><a th:href="@{/admin}"> BACK </a> </button>
+                        <button class="buttonFunctionality tableButton" type="button"><a th:href="@{/admin/viewMap}"> RELOAD </a> </button>
+                    </td>
+                </tr>
+
+            </table>
+    </div>
+
+    <div class="container">
+        <table id="mainTable" asyncLoad='true' ></table>
+    </div>
+
+
+</body>
+
+
+
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>FooTicket - Buy Ticket </title>
+    <th:block th:include="fragments/commonResources :: commons"></th:block>
+    <link rel="stylesheet" th:href="@{/css/map.css}">
+    <script th:src="@{/script/map.js}"></script>
+</head>
+
+<body>
+
+    <div th:replace="fragments/accountInfo :: myHeader"></div>
+
+    <h1> Select available places </h1>
+    <div>
+        <span class="negativeMessage" th:if="${param.purchasedTicket!=null and param.purchasedTicket}">
+            You have not selected any seat.
+        </span>
+        <span class="negativeMessage" th:if="${param.errorNoMoney!=null and param.errorNoMoney}">
+           You have not enough money to complete the operation.
+        </span>
+        <span class="negativeMessage" th:if="${param.errorDuringSave!=null and param.errorDuringSave}">
+            An Error occurred during the confirm operation!
+        </span>
+
+            <table class="tableSelection">
+                <tr>
+                    <td> Rows x Columns </td>
+                    <td>   <span class="numRows"></span> x <span class="numCols"></span> </td>
+                </tr>
+                <tr>
+                    <td> Price per seat </td>
+                    <td> <span class="price"></span></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button class="buttonFunctionality buttonBack tableButton" type="button"><a th:href="@{/buyer}"> BACK </a> </button>
+                        <button class="buttonFunctionality tableButton" type="button"><a th:href="@{/buyer/buyTicket}"> RELOAD </a> </button>
+                        <form class="mapForm" method='POST' th:action="@{/buyer/executeBuy}"> <button class="buttonFunctionality tableButton" > CONFIRM </button></form>
+                    </td>
+                </tr>
+
+            </table>
+    </div>
+
+    <div class="container">
+        <table id="mainTable" asyncLoad='true' auth="buyer"></table>
+    </div>
+
+
+</body>
+
+
+
+</html>

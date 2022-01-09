@@ -25,7 +25,7 @@ public class Transaction implements Serializable {
     @Column(name="price")
     private Double price;
 
-    @Column(name="timestamp")
+    @Column(name="timestamp", insertable = false, updatable = false)
     private LocalDateTime timestamp;
 
     @ManyToOne
