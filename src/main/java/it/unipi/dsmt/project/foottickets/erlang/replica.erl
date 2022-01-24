@@ -22,6 +22,7 @@ init([]) ->
 handle_call(Request, From, State = #state{tbl = Table}) ->
 	%io:format("We are in the handle_call, ~w~n", [Request]),
 	case Request of		
+		%%v1
 		{Disp_PID, Java_PID, create, Map} when is_atom(create) ->
 			io:format("Creating a map in the replica node~n"),
 			%if ets:match(Table, Map) == False ->
@@ -71,10 +72,76 @@ handle_call(Request, From, State = #state{tbl = Table}) ->
 			io:format("View the map in the replica node~n"),
 			Result = {noreply, State},		
 			Disp_PID ! {Java_PID, ets:first(Table)};
+
+		%%v2
+
+		{Disp_PID, Java_PID, create, NRows, NCols, Price, Map} when is_atom(create) ->
+			io:format("Creating a map in the replica node~n"),
+			AlreadyExist = ets:match(Table, Map),
+			if AlreadyExist == false ->
+				Hash = crypto:hash(md5, "test"),
+				ets:insert(Table, {Map, Hash, NRows, NCols, Price}),
+				io:format("~w~n", ets:lookup(Table, Map)),
+				Result = {noreply, State},		
+				Disp_PID ! {Java_PID, created, Hash};
+				
+			true ->
+				Result = {noreply, State},
+				Disp_PID ! {Java_PID, alreadyExist}
+			end;
+
+		{Disp_PID, Java_PID, select, Seat} when is_atom(select) ->
+			io:format("Buying a seat in the replica node~n"),
+			Check = maps:find({Seat}, ets:first(Table)),
+			io:format("Checking if a seat is available in the replica node  ~w~n", [Check]),
 			
+			if  Check == {ok, {not_used}} ->
+				Map = maps:update({Seat}, {used}, ets:first(Table)),
+				%io:format("~n~w~n", [Map]),
+				ets:insert(Table, {Map}),
+				Result = {noreply, State},
+				Disp_PID ! {Java_PID, selected, Map};
+				
+			true ->
+				Result = {noreply, State},	
+				Disp_PID ! {Java_PID, notSelected, ets:first(Table)}
+								
+			end;
+	
+		{Disp_PID, Java_PID, unselect, Seat} when is_atom(unselect) ->
+			io:format("Buying a seat in the replica node~n"),
+			Check = maps:find({Seat}, ets:first(Table)),
+			io:format("Checking if a seat is available in the replica node  ~w~n", [Check]),
+			
+			if  Check == {ok, {used}} ->
+				Map = maps:update({Seat}, {not_used}, ets:first(Table)),
+				%io:format("~n~w~n", [Map]),
+				ets:insert(Table, {Map}),
+				Result = {noreply, State},
+				Disp_PID ! {Java_PID, unselected, Map};
+				
+			true ->
+				Result = {noreply, State},	
+				Disp_PID ! {Java_PID, notUnselected, ets:first(Table)}
+								
+			end;
+
+
+		{Disp_PID, Java_PID, show, Hash} when is_atom(show) ->
+			io:format("View the map in the replica node~n"),
+			Result = {noreply, State},		
+			Disp_PID ! {Java_PID, ets:first(Table)};
+		
+		
+		{Disp_PID, Java_PID, _} ->
+			Disp_PID ! {Java_PID, errorRequest},
+			Result = {noreply, State};
+
 		_->
 			io:format("error call~n"),
 			Result = {noreply, State}
+
+		
 	end,
     Result = {noreply, State},
     %io:format("handle_call: ~p~n", [Reply]),
