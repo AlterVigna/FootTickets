@@ -153,7 +153,7 @@ function addTdEventForAdmin(elem){
         $("#" + id).attr("class", "fas fa-clipboard-check");
         $(elem).attr("sel", "true");
 
-        addHiddenElement($(this));
+        addHiddenElement($(elem));
     } else {
         $(elem).attr("title","Available");
         $(elem).removeClass("selected");
@@ -230,7 +230,10 @@ function removeHiddenElement(elem){
 
         $.post( path, {placeSelected:placeSelected,operation:operation})
             .done(function( JSON_ANSWER ) {
-
+                answer=JSON_ANSWER["answer"];
+                if (answer!="1"){
+                    alert(" Hey someone has reserved that seat before you. Please select an other one!")
+                }
                 numRows=JSON_ANSWER["numRows"];
                 numCols=JSON_ANSWER["numCols"];
                 price=JSON_ANSWER["price"];
@@ -258,8 +261,8 @@ function removeHiddenElement(elem){
 
 
 
-
-// Grafical Effects (evaluate to implement)
+// Not used for now.
+// Graphical Effects (evaluate to implement)
 
 var arrayEffectsEvent = [];
 var inter;
@@ -280,7 +283,6 @@ function startEffect(idCell) {
             }, 1000);
         }, 1000);
     }, 3000);
-
 
     arrayEffectsEvent[idCell] = inter;
 }

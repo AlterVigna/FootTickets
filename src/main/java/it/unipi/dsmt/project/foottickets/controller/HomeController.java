@@ -1,8 +1,10 @@
 package it.unipi.dsmt.project.foottickets.controller;
 
 
+import it.unipi.dsmt.project.foottickets.erlangInterfaces.DispatcherInterface;
 import it.unipi.dsmt.project.foottickets.model.Account;
 import it.unipi.dsmt.project.foottickets.service.IAccountService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
@@ -15,11 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 
+
 import static it.unipi.dsmt.project.foottickets.configuration.GlobalConfiguration.*;
 
 
 @Controller
 public class HomeController {
+
+    @Autowired
+    DispatcherInterface dispatcherInterface;
 
     @Autowired
     @Qualifier("mainAccountService")

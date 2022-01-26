@@ -1,6 +1,10 @@
 package it.unipi.dsmt.project.foottickets.configuration;
 
-import it.unipi.dsmt.project.foottickets.model.Account;
+import it.unipi.dsmt.project.foottickets.erlangInterfaces.DispatcherInterface;
+
+import org.json.JSONObject;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSessionEvent;
@@ -43,7 +47,7 @@ public class HttpSessionListenerConfig implements HttpSessionListener {
     }
 
     /**
-     * This method will be automatically called when session destroyed
+     * This method will be automatically called when session destroyed.
      *
      * @param sessionEvent
      */
@@ -51,13 +55,38 @@ public class HttpSessionListenerConfig implements HttpSessionListener {
     public void sessionDestroyed(HttpSessionEvent sessionEvent) {
         //  LOG.info("-------Decrementing Session Counter--------");
 
-        Set<String> selectedPlaces = (Set<String>) sessionEvent.getSession().getAttribute(KEY_SELECTED_SEATS);
-        Account account = (Account) sessionEvent.getSession().getAttribute(KEY_CURRENT_USER);
-        Integer seatPrice = (Integer) sessionEvent.getSession().getAttribute(KEY_SEAT_COST);
+        // Another way to retrieve bean inside the application context.
+        WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(sessionEvent.getSession().getServletContext());
+        DispatcherInterface di = (DispatcherInterface) context.getBean("dispatcherInterface");
 
-        // TODO call to dispatcer for removing  selected seats and make them available.
+        
+        Set<String> selectedPlaces = (Set<String>) sessionEvent.getSession().getAttribute(KEY_SELECTED_SEATS);
+        if (selectedPlaces!=null){
+            for (String selPlace: selectedPlaces) {
+
+                JSONObject jsonRequest=new JSONObject();
+                try {
+                    jsonRequest.put("operation",ERL_OP_CODE_DESELECT_PLACE);
+                    jsonRequest.put("placeSelected",selPlace);
+                    di.executeClientTask(jsonRequest);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         activeSessions.decrementAndGet();
         sessionEvent.getSession().setAttribute("activeSessions", activeSessions.get());
+        System.out.println("Session Destroyed!");
         // LOG.info("-------Session Destroyed--------");
     }
+
+
+    private DispatcherInterface getDispatcherInterface(HttpSessionEvent se) {
+        WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(se.getSession().getServletContext());
+        return (DispatcherInterface) context.getBean("dispatcherInterface");
+    }
+
+
 }

@@ -2,8 +2,10 @@ package it.unipi.dsmt.project.foottickets.controller;
 
 
 import it.unipi.dsmt.project.foottickets.dto.CreateMapDTO;
+import it.unipi.dsmt.project.foottickets.erlangInterfaces.DispatcherInterface;
 import it.unipi.dsmt.project.foottickets.model.Account;
 import it.unipi.dsmt.project.foottickets.service.IAccountService;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -22,6 +24,9 @@ import static it.unipi.dsmt.project.foottickets.configuration.GlobalConfiguratio
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+
+    @Autowired
+    DispatcherInterface dispatcherInterface;
 
     @Autowired
     @Qualifier("mainAccountService")
@@ -58,10 +63,34 @@ public class AdminController {
             System.out.println("Row :"+splitted[0]+" Column :"+splitted[1]);
         }
 
-        // TODO implementation of call to dispatcher
-        boolean esit=true;
 
-        return  "redirect:"+HOME_ADMIN+"?mapCreated="+esit;
+        JSONObject requestJson=null;
+        JSONObject responseJson=null;
+        boolean outcome=true;
+
+        try {
+            requestJson = mapForm.toJSON();
+            responseJson = dispatcherInterface.executeClientTask(requestJson);
+
+            if (responseJson!=null){
+
+                int answer = Integer.parseInt(responseJson.getString("answer"));
+                if (answer==POSITIVE_ANSWER){
+                    String hash=responseJson.getString("hash");
+                    dispatcherInterface.getMapState().setHash(hash);
+                    dispatcherInterface.getMapState().setLockedPlaces(mapForm.getSelectedPlaces());
+                    //request.getSession().setAttribute(KEY_SELECTED_SEATS,mapForm.getSelectedPlaces());
+                }
+                else{
+                    outcome = false;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            outcome = false;
+        }
+
+        return  "redirect:"+HOME_ADMIN+"?mapCreated="+outcome;
     }
 
 

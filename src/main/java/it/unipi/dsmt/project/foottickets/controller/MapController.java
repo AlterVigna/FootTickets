@@ -2,7 +2,11 @@ package it.unipi.dsmt.project.foottickets.controller;
 
 import it.unipi.dsmt.project.foottickets.dto.MapDTO;
 import it.unipi.dsmt.project.foottickets.dto.SeatInfo;
+import it.unipi.dsmt.project.foottickets.erlangInterfaces.DispatcherInterface;
 import it.unipi.dsmt.project.foottickets.model.Account;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,34 +25,77 @@ import static it.unipi.dsmt.project.foottickets.configuration.GlobalConfiguratio
 public class MapController {
 
 
+    @Autowired
+    private DispatcherInterface dispatcherInterface;
+
     // This request is idempotent
     // Return the JSON of the actual seats map
     @GetMapping("/map")
     public ResponseEntity getCompleteMap(HttpServletRequest request){
 
-
-        // TODO IMPLEMENT A CALL TO DISPATCHER
-
-        // Evaluate the fact of using a cache of the current map to avoid sending all time requests to dispatcers.
         MapDTO map= new MapDTO();
-        map.setNumRows(1);
-        map.setNumCols(15);
-        map.setPrice(50);
-        map.getLockedPlaces().add("0_1");
-        map.getLockedPlaces().add("0_2");
-        map.getLockedPlaces().add("0_3");
-        // This is a sort of answer we expect from dispatcher.
 
-        // If it realizes that is a logged user who made the request, it adds the places stored in the session.
-        Set<String> listBuyerSelectedSeats=null;
-        if (request.getSession()!=null && request.getSession().getAttribute(KEY_SELECTED_SEATS)!=null){
-            listBuyerSelectedSeats=(Set<String>) request.getSession().getAttribute(KEY_SELECTED_SEATS);
-            for (String seat:listBuyerSelectedSeats) {
-                map.getCurrentSelectedPlaces().add(seat);
+        JSONObject requestJson=null;
+        JSONObject responseJson=null;
+        try{
+            requestJson= new JSONObject();
+            requestJson.put("operation",ERL_OP_CODE_SHOW_MAP);
+
+            if (request.getSession()!=null){
+                requestJson.put("hash",dispatcherInterface.getMapState().getHash());
             }
-            // From dispatcher this is not fixed..
-            request.getSession().setAttribute(KEY_SEAT_COST,50);
+
+
+            responseJson=dispatcherInterface.executeClientTask(requestJson);
+            int answer = Integer.parseInt(responseJson.getString("answer"));
+
+            switch (answer){
+                case POSITIVE_ANSWER:
+
+                    String hash=responseJson.getString("hash");
+
+                    map.setNumRows(responseJson.getLong("numRows"));
+                    map.setNumCols(responseJson.getLong("numCols"));
+                    map.setPrice(responseJson.getLong("price"));
+
+                    JSONArray jsonArray = responseJson.getJSONArray("lockedPlaces");
+                    for (int i=0;i<jsonArray.length();i++){
+                        String lockedPlace = jsonArray.getString(i);
+                        map.getLockedPlaces().add(lockedPlace);
+                    }
+
+                    dispatcherInterface.getMapState().setHash(hash);
+                    dispatcherInterface.getMapState().setNumRows(map.getNumRows());
+                    dispatcherInterface.getMapState().setNumCols(map.getNumCols());
+                    dispatcherInterface.getMapState().setPrice(map.getPrice());
+                    dispatcherInterface.getMapState().setLockedPlaces(map.getLockedPlaces());
+
+                    addAdditionalSelectedPlaces(map,request);
+
+                    break;
+
+                case HASH_MATCHES:
+
+                    map.setNumRows(dispatcherInterface.getMapState().getNumRows());
+                    map.setNumCols(dispatcherInterface.getMapState().getNumCols());
+                    map.setPrice(dispatcherInterface.getMapState().getPrice());
+                    map.setLockedPlaces(dispatcherInterface.getMapState().getLockedPlaces());
+                    addAdditionalSelectedPlaces(map,request);
+                    break;
+
+                case NEGATIVE_ANSWER:
+                    //todo
+                    break;
+
+                default:
+                    System.out.println("Should never enter here!");
+                    break;
+            }
         }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+
         return ResponseEntity.ok(map);
     }
 
@@ -83,60 +130,90 @@ public class MapController {
 
         Account account=(Account) request.getSession().getAttribute(KEY_CURRENT_USER);
 
+        JSONObject requestJson=null;
+        JSONObject responseJson=null;
+        try{
 
+            requestJson= new JSONObject();
+            requestJson.put("operation",seatInfo.get().getOperation());
+            requestJson.put("placeSelected",seatInfo.get().getPlaceSelected());
 
-        // TODO IMPLEMENT A CALL TO DISPATCHER
+            responseJson = dispatcherInterface.executeClientTask(requestJson);
 
-        // if positive answer
-        map.setAnswer(POSITIVE_ANSWER);
-        map.setNumRows(1);
-        map.setNumCols(15);
-        map.setPrice(50);
-        map.getLockedPlaces().add("0_1");
-        map.getLockedPlaces().add("0_2");
-        map.getLockedPlaces().add("0_3");
+            int answer = Integer.parseInt(responseJson.getString("answer"));
 
+            String hash=responseJson.getString("hash");
 
-        // From dispatcher this is not fixed.
-        request.getSession().setAttribute(KEY_SEAT_COST,50);
+            map.setNumRows(dispatcherInterface.getMapState().getNumRows());
+            map.setNumCols(dispatcherInterface.getMapState().getNumCols());
+            map.setPrice(dispatcherInterface.getMapState().getPrice());
 
-        Set<String> currentSelectedSeats=null;
-        if (request.getSession()!=null && request.getSession().getAttribute(KEY_SELECTED_SEATS)!=null){
-            currentSelectedSeats=(Set<String>) request.getSession().getAttribute(KEY_SELECTED_SEATS);
-        }
-        else {
-            currentSelectedSeats= new HashSet<>();
-        }
+            JSONArray jsonArray = responseJson.getJSONArray("lockedPlaces");
+            for (int i=0;i<jsonArray.length();i++){
+                String lockedPlace = jsonArray.getString(i);
+                map.getLockedPlaces().add(lockedPlace);
+            }
+            dispatcherInterface.getMapState().setHash(hash);
+            dispatcherInterface.getMapState().setLockedPlaces(map.getLockedPlaces());
 
-        if ("select".equals(seatInfo.get().getOperation())){
+            Set<String> currentSelectedSeats=null;
+            if (request.getSession()!=null && request.getSession().getAttribute(KEY_SELECTED_SEATS)!=null){
+                currentSelectedSeats=(Set<String>) request.getSession().getAttribute(KEY_SELECTED_SEATS);
+            }
+            else {
+                currentSelectedSeats= new HashSet<>();
+            }
 
-            currentSelectedSeats.add(seatInfo.get().getPlaceSelected());
+            if (answer==POSITIVE_ANSWER){
+                map.setAnswer(POSITIVE_ANSWER);
 
-            // The answer to web page is all the seats selected during the session activity.
-            for (String seat:currentSelectedSeats) {
-                map.getCurrentSelectedPlaces().add(seat);
+                if (JS_OP_CODE_SELECT_PLACE.equals(seatInfo.get().getOperation())){
+
+                    currentSelectedSeats.add(seatInfo.get().getPlaceSelected());
+
+                    // The answer to web page is all the seats selected during the session activity.
+                    for (String seat:currentSelectedSeats) {
+                        map.getCurrentSelectedPlaces().add(seat);
+                    }
+                }
+
+                if (JS_OP_CODE_DESELECT_PLACE.equals(seatInfo.get().getOperation())){
+                    currentSelectedSeats.remove(seatInfo.get().getPlaceSelected());
+                    for (String seat:currentSelectedSeats) {
+                        map.getCurrentSelectedPlaces().add(seat);
+                    }
+                }
+
+                // Before answer positive I update the session with current values.
+                request.getSession().setAttribute(KEY_SELECTED_SEATS,currentSelectedSeats);
+            }
+            else {
+                // Handled in HTML like a popup msg.
+                map.setAnswer(NEGATIVE_ANSWER);
             }
         }
+        catch (Exception ex){
+            ex.printStackTrace();
 
-        if ("deselect".equals(seatInfo.get().getOperation())){
-            currentSelectedSeats.remove(seatInfo.get().getPlaceSelected());
-            for (String seat:currentSelectedSeats) {
-                map.getCurrentSelectedPlaces().add(seat);
-            }
+            // Here finish to implement negative answers.
         }
 
-        // Before answer positive I update the session with current values.
-        request.getSession().setAttribute(KEY_SELECTED_SEATS,currentSelectedSeats);
-
-        map.setAnswer(POSITIVE_ANSWER);
         map.setResponseCode(HttpStatus.OK.value());
-
         return ResponseEntity.ok(map);
-
     }
 
+    // If it realizes that is a logged user who made the request, it adds the places selected by him stored in the session.
+    private void addAdditionalSelectedPlaces(MapDTO map, HttpServletRequest request){
 
+        Set<String> listBuyerSelectedSeats=null;
+        if (request.getSession()!=null && request.getSession().getAttribute(KEY_SELECTED_SEATS)!=null){
+            listBuyerSelectedSeats=(Set<String>) request.getSession().getAttribute(KEY_SELECTED_SEATS);
+            for (String seat:listBuyerSelectedSeats) {
+                map.getCurrentSelectedPlaces().add(seat);
+            }
+        }
 
+    }
 
 
 

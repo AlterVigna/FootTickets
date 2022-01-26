@@ -32,14 +32,39 @@ public class GlobalConfiguration {
     // Session Keyword
     public static final String KEY_CURRENT_USER="current_user";
     public static final String KEY_SELECTED_SEATS="selected_seats";
-    public static final String KEY_SEAT_COST="seat_cost";
+
+    //public static final String KEY_SEAT_COST="seat_cost";
+    //public static final String KEY_HASH_MAP="hash_map";
 
 
     // Other parameter
     public static final Double DEFAULT_NEW_AMOUNT=500.00;
     public static final String WRONG_PASSWORD="§§§__WRONG__PASSWORD__4SURE__§§";
 
-    public static int POSITIVE_ANSWER=1;
-    public static int NEGATIVE_ANSWER=0;
+    public static final int POSITIVE_ANSWER=1;
+    public static final int NEGATIVE_ANSWER=0;
+    public static final int HASH_MATCHES=2;
+
+    // Erlang communication codes
+    public static final String JS_OP_CODE_CREATE_MAP="create";
+    public static final String JS_OP_CODE_SELECT_PLACE="select";
+    public static final String JS_OP_CODE_DESELECT_PLACE="deselect";
+    public static final String JS_OP_CODE_SHOW_MAP="show";
+    public static final String ERL_OP_CODE_CREATE_MAP="create";
+    public static final String ERL_OP_CODE_SELECT_PLACE="select";
+    public static final String ERL_OP_CODE_DESELECT_PLACE="deselect";// unselect
+    public static final String ERL_OP_CODE_SHOW_MAP="show";
+
+    public static final String ERL_PLACE_FREE="not_used";
+    public static final String ERL_PLACE_BUSY="used";
+
+    public static final String ERL_POS_ANSWER="ok";
+    public static final String ERL_HASH_MATCHES="ok_hash";
+    public static final String ERL_NEG_ANSWER="no_ok";
+
+
+
+
+
 
 }

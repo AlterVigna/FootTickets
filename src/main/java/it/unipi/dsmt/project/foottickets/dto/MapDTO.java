@@ -29,9 +29,9 @@ public class MapDTO implements Serializable {
 
 
     Integer answer;
-    Integer numRows;
-    Integer numCols;
-    Integer price;
+    Long numRows;
+    Long numCols;
+    Long price;
     Set<String> lockedPlaces=new HashSet<>(); // All locked placed (by other)
     Set<String> currentSelectedPlaces=new HashSet<>(); // All places selected by the user who ask to buy
 

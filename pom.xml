@@ -17,10 +17,10 @@
         <java.version>1.8</java.version>
     </properties>
     <dependencies>
-       <!-- <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jdbc</artifactId>
-        </dependency>-->
+        <!-- <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-data-jdbc</artifactId>
+         </dependency>-->
 
         <dependency>
             <groupId>mysql</groupId>
@@ -78,8 +78,26 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>clojang</groupId>
+            <artifactId>erlang-jinterface</artifactId>
+            <version>1.10-1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin.external.google</groupId>
+            <artifactId>android-json</artifactId>
+            <version>0.0.20131108.vaadin1</version>
+        </dependency>
 
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>repo2-jinterface</id>
+            <name>repository2 for Erlang jinterface</name>
+            <url>https://clojars.org/repo/</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>

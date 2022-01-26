@@ -1,5 +1,6 @@
 package it.unipi.dsmt.project.foottickets.controller;
 
+import it.unipi.dsmt.project.foottickets.erlangInterfaces.DispatcherInterface;
 import it.unipi.dsmt.project.foottickets.model.Account;
 import it.unipi.dsmt.project.foottickets.model.Transaction;
 import it.unipi.dsmt.project.foottickets.service.IAccountService;
@@ -23,6 +24,9 @@ import static it.unipi.dsmt.project.foottickets.configuration.GlobalConfiguratio
 @Controller
 @RequestMapping("/buyer")
 public class BuyerController {
+
+    @Autowired
+    DispatcherInterface dispatcherInterface;
 
     @Autowired
     @Qualifier("mainAccountService")
@@ -71,7 +75,8 @@ public class BuyerController {
 
         // I read again from db to have a currect view of amount of logged user.
         Account account= (Account) request.getSession().getAttribute(KEY_CURRENT_USER);
-        Integer seatPrice = (Integer) request.getSession().getAttribute(KEY_SEAT_COST);
+        Long seatPrice = dispatcherInterface.getMapState().getPrice();
+                //(Integer) request.getSession().getAttribute(KEY_SEAT_COST);
 
         Optional<Account> updatedAccount = accountService.findByUsername(account.getUsername());
         if (updatedAccount.isPresent()){

@@ -13,7 +13,7 @@
 
     <h1> Select available places </h1>
     <div>
-        <span class="negativeMessage" th:if="${param.purchasedTicket!=null and param.purchasedTicket}">
+        <span class="negativeMessage" th:if="${param.errorNoSelectedSeat!=null and param.errorNoSelectedSeat}">
             You have not selected any seat.
         </span>
         <span class="negativeMessage" th:if="${param.errorNoMoney!=null and param.errorNoMoney}">
