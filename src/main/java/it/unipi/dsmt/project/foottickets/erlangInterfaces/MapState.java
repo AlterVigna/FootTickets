@@ -22,7 +22,7 @@ public class MapState {
 
 
     MapState(){
-        this.hash="";
+        this.hash="0";
         this.numRows=0L;
         this.numCols=0L;
         this.price=0L;

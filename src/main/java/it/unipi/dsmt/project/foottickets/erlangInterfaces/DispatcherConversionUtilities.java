@@ -111,9 +111,10 @@ public static OtpErlangTuple selectDeselectErlangRequest(OtpErlangPid self,JSONO
     }
 
     OtpErlangString erlPlaceString= new OtpErlangString(placeSel);
-    OtpErlangTuple keyTuple = new OtpErlangTuple(erlPlaceString);
+    //OtpErlangTuple keyTuple = new OtpErlangTuple(erlPlaceString);
+    //OtpErlangString place= new OtpErlangString()
 
-    OtpErlangTuple returnTuple = new OtpErlangTuple(new OtpErlangObject[]{self, opcode, keyTuple});
+    OtpErlangTuple returnTuple = new OtpErlangTuple(new OtpErlangObject[]{self, opcode, erlPlaceString});
 
     return returnTuple;
 
@@ -228,8 +229,8 @@ public static JSONObject answerShowMapFromErlang (OtpErlangTuple msgReply){
     if (ERL_POS_ANSWER.equals(answer)){
         answer=POSITIVE_ANSWER+"";
 
-        OtpErlangString ErlMsg = (OtpErlangString) msgReply.elementAt(2);
-        String msg = ErlMsg.stringValue();
+        /*OtpErlangString ErlMsg = (OtpErlangString) msgReply.elementAt(2);
+        String msg = ErlMsg.stringValue();*/
 
         MapState mapState=populateErlangMapStateSHOWMAP(msgReply);
 
@@ -237,7 +238,7 @@ public static JSONObject answerShowMapFromErlang (OtpErlangTuple msgReply){
             json = mapState.toJSON();
 
             json.put("answer",answer);
-            json.put("msg",msg);
+            json.put("msg","");
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -324,24 +325,24 @@ private static MapState populateErlangMapStateSHOWMAP(OtpErlangTuple msgReply){
     MapState newMap= new MapState();
 
 
-    OtpErlangString ErlHash = (OtpErlangString) msgReply.elementAt(1);
-    String hash = ErlHash.stringValue();
+    OtpErlangLong ErlHash = (OtpErlangLong) msgReply.elementAt(1);
+    Long hash = ErlHash.longValue();
 
 
-    OtpErlangLong ErlNumRows= (OtpErlangLong) msgReply.elementAt(3);
+    OtpErlangLong ErlNumRows= (OtpErlangLong) msgReply.elementAt(2);
     long numRows = ErlNumRows.longValue();
 
-    OtpErlangLong ErlNumCols= (OtpErlangLong) msgReply.elementAt(4);
+    OtpErlangLong ErlNumCols= (OtpErlangLong) msgReply.elementAt(3);
     long numCols = ErlNumCols.longValue();
 
-    OtpErlangLong ErlNumPrice= (OtpErlangLong) msgReply.elementAt(5);
+    OtpErlangLong ErlNumPrice= (OtpErlangLong) msgReply.elementAt(4);
     long price = ErlNumPrice.longValue();
     
     Set<String> lockedPlaces= new HashSet<>();
-    OtpErlangMap ErlMap =(OtpErlangMap) msgReply.elementAt(6);
+    OtpErlangMap ErlMap =(OtpErlangMap) msgReply.elementAt(5);
     lockedPlaces.addAll(convertMapReceived(ErlMap));
 
-    newMap.setHash(hash);
+    newMap.setHash(hash+"");
     newMap.setNumRows(numRows);
     newMap.setNumCols(numCols);
     newMap.setPrice(price);
@@ -355,14 +356,14 @@ private static MapState populateErlangMapStateSHOWMAP(OtpErlangTuple msgReply){
 
         MapState newMap= new MapState();
 
-        OtpErlangString ErlHash = (OtpErlangString) msgReply.elementAt(1);
-        String hash = ErlHash.stringValue();
+        OtpErlangLong ErlHash = (OtpErlangLong) msgReply.elementAt(1);
+        Long hash = ErlHash.longValue();
 
         Set<String> lockedPlaces= new HashSet<>();
         OtpErlangMap ErlMap =(OtpErlangMap) msgReply.elementAt(3);
         lockedPlaces.addAll(convertMapReceived(ErlMap));
 
-        newMap.setHash(hash);
+        newMap.setHash(hash+"");
         newMap.setLockedPlaces(lockedPlaces);
 
         return newMap;

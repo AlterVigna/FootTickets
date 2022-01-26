@@ -52,7 +52,7 @@ public class GlobalConfiguration {
     public static final String JS_OP_CODE_SHOW_MAP="show";
     public static final String ERL_OP_CODE_CREATE_MAP="create";
     public static final String ERL_OP_CODE_SELECT_PLACE="select";
-    public static final String ERL_OP_CODE_DESELECT_PLACE="deselect";// unselect
+    public static final String ERL_OP_CODE_DESELECT_PLACE="unselect";
     public static final String ERL_OP_CODE_SHOW_MAP="show";
 
     public static final String ERL_PLACE_FREE="not_used";

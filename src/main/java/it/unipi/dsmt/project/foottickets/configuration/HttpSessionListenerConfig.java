@@ -66,7 +66,7 @@ public class HttpSessionListenerConfig implements HttpSessionListener {
 
                 JSONObject jsonRequest=new JSONObject();
                 try {
-                    jsonRequest.put("operation",ERL_OP_CODE_DESELECT_PLACE);
+                    jsonRequest.put("operation",JS_OP_CODE_DESELECT_PLACE);
                     jsonRequest.put("placeSelected",selPlace);
                     di.executeClientTask(jsonRequest);
 

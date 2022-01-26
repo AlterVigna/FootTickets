@@ -39,7 +39,7 @@ public class MapController {
         JSONObject responseJson=null;
         try{
             requestJson= new JSONObject();
-            requestJson.put("operation",ERL_OP_CODE_SHOW_MAP);
+            requestJson.put("operation",JS_OP_CODE_SHOW_MAP);
 
             if (request.getSession()!=null){
                 requestJson.put("hash",dispatcherInterface.getMapState().getHash());
@@ -76,15 +76,11 @@ public class MapController {
 
                 case HASH_MATCHES:
 
-                    map.setNumRows(dispatcherInterface.getMapState().getNumRows());
-                    map.setNumCols(dispatcherInterface.getMapState().getNumCols());
-                    map.setPrice(dispatcherInterface.getMapState().getPrice());
-                    map.setLockedPlaces(dispatcherInterface.getMapState().getLockedPlaces());
-                    addAdditionalSelectedPlaces(map,request);
+                    populateStandardAnswer(map,request);
                     break;
 
                 case NEGATIVE_ANSWER:
-                    //todo
+                    populateStandardAnswer(map,request);
                     break;
 
                 default:
@@ -190,6 +186,12 @@ public class MapController {
             else {
                 // Handled in HTML like a popup msg.
                 map.setAnswer(NEGATIVE_ANSWER);
+
+                // The answer to web page is all the seats selected during the session activity.
+                for (String seat:currentSelectedSeats) {
+                    map.getCurrentSelectedPlaces().add(seat);
+                }
+
             }
         }
         catch (Exception ex){
@@ -214,6 +216,17 @@ public class MapController {
         }
 
     }
+    // Used for multiple answers if hash matches
+    private void populateStandardAnswer(MapDTO map, HttpServletRequest request){
+
+        map.setNumRows(dispatcherInterface.getMapState().getNumRows());
+        map.setNumCols(dispatcherInterface.getMapState().getNumCols());
+        map.setPrice(dispatcherInterface.getMapState().getPrice());
+        map.setLockedPlaces(dispatcherInterface.getMapState().getLockedPlaces());
+        addAdditionalSelectedPlaces(map,request);
+
+    }
+
 
 
 

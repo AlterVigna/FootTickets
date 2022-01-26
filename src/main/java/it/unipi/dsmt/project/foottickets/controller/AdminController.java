@@ -43,9 +43,9 @@ public class AdminController {
     public String createMap(HttpServletRequest request, Model model){
 
         CreateMapDTO mapForm= new CreateMapDTO();
-        mapForm.setNumRows(1);
-        mapForm.setNumCols(1);
-        mapForm.setPrice(50);
+        mapForm.setNumRows(1L);
+        mapForm.setNumCols(1L);
+        mapForm.setPrice(50L);
         model.addAttribute("mapForm",mapForm);
 
         return CREATE_MAP_VIEW;
@@ -78,6 +78,9 @@ public class AdminController {
                 if (answer==POSITIVE_ANSWER){
                     String hash=responseJson.getString("hash");
                     dispatcherInterface.getMapState().setHash(hash);
+                    dispatcherInterface.getMapState().setNumRows(mapForm.getNumRows());
+                    dispatcherInterface.getMapState().setNumCols(mapForm.getNumCols());
+                    dispatcherInterface.getMapState().setPrice(mapForm.getPrice());
                     dispatcherInterface.getMapState().setLockedPlaces(mapForm.getSelectedPlaces());
                     //request.getSession().setAttribute(KEY_SELECTED_SEATS,mapForm.getSelectedPlaces());
                 }

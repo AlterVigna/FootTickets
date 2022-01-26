@@ -20,9 +20,9 @@ import static it.unipi.dsmt.project.foottickets.configuration.GlobalConfiguratio
 @Setter
 public class CreateMapDTO {
 
-    Integer numRows;
-    Integer numCols;
-    Integer price;
+    Long numRows;
+    Long numCols;
+    Long price;
     Set<String> selectedPlaces=new HashSet<>();
 
 
