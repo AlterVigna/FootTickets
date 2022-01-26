@@ -88,7 +88,7 @@ handle_call(Request, From, State = #state{tbl = Table}) ->
 			
 			true ->
 				Result = {noreply, State},
-				Disp_PID ! {Java_PID, show, ets:lookup_element(Table, map, 2), Hash, ets:lookup_element(Table, nRows, 2), ets:lookup_element(Table, nCols, 2), ets:lookup_element(Table, price, 2)}
+				Disp_PID ! {Java_PID, show, ets:lookup_element(Table, map, 2), NodeHash, ets:lookup_element(Table, nRows, 2), ets:lookup_element(Table, nCols, 2), ets:lookup_element(Table, price, 2)}
 
 			end;
 					
