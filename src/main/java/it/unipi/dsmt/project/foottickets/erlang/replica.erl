@@ -22,66 +22,15 @@ init([]) ->
 handle_call(Request, From, State = #state{tbl = Table}) ->
 	%io:format("We are in the handle_call, ~w~n", [Request]),
 	case Request of		
-		%%v1
-		{Disp_PID, Java_PID, create, Map} when is_atom(create) ->
-			io:format("Creating a map in the replica node~n"),
-			%if ets:match(Table, Map) == False ->
-			
-				ets:insert(Table, {Map}),
-				io:format("~w~n", ets:lookup(Table, Map)),
-				Result = {noreply, State},		
-				Disp_PID ! {Java_PID, created};
-				
-			%true ->
-				%Disp_PID ! {Java_PID, alreadyExist}
-			%end;
-			
-		{Disp_PID, Java_PID, isAvailable, Seat} when is_atom(isAvailable) ->
-			Check = maps:find({Seat}, ets:first(Table)),
-			io:format("Checking if a seat is available in the replica node  ~w~n", [Check]),
-			
-			if  Check == {ok, {not_used}} ->
-				Result = {noreply, State},	
-				Disp_PID ! {Java_PID, isAvailable};
-						
-			true ->
-				Result = {noreply, State},	
-				Disp_PID ! {Java_PID, notAvailable}
-				
-			end;
-			
-		{Disp_PID, Java_PID, buy, Seat} when is_atom(buy) ->
-			io:format("Buying a seat in the replica node~n"),
-			Check = maps:find({Seat}, ets:first(Table)),
-			io:format("Checking if a seat is available in the replica node  ~w~n", [Check]),
-			
-			if  Check == {ok, {not_used}} ->
-				Map = maps:update({Seat}, {used}, ets:first(Table)),
-				%io:format("~n~w~n", [Map]),
-				ets:insert(Table, {Map}),
-				Result = {noreply, State},
-				Disp_PID ! {Java_PID, bought};
-				
-			true ->
-				Result = {noreply, State},	
-				Disp_PID ! {Java_PID, notAvailable}
-								
-			end;
-	
-		{Disp_PID, Java_PID, view} when is_atom(view) ->
-			io:format("View the map in the replica node~n"),
-			Result = {noreply, State},		
-			Disp_PID ! {Java_PID, ets:first(Table)};
-
 		%%v2
 
 		{Disp_PID, Java_PID, create, NRows, NCols, Price, Map} when is_atom(create) ->
-			io:format("Creating a map in the replica node~n"),
-			AlreadyExist = ets:match(Table, Map),
+			AlreadyExist = ets:member(Table, Map),
+			io:format("Creating a map in the replica node~w~n", [AlreadyExist]),
 			if AlreadyExist == false ->
-				Hash = crypto:hash(md5, "test"),
-				ets:insert(Table, {Map, Hash, NRows, NCols, Price}),
-				io:format("~w~n", ets:lookup(Table, Map)),
+				Hash = 0,
+				ets:insert(Table, [{map, Map}, {hash, Hash}, {nRows, NRows}, {nCols, NCols}, {price, Price}]),
+				io:format("~w~n", [ets:lookup(Table, map)]),
 				Result = {noreply, State},		
 				Disp_PID ! {Java_PID, created, Hash};
 				
@@ -92,45 +41,58 @@ handle_call(Request, From, State = #state{tbl = Table}) ->
 
 		{Disp_PID, Java_PID, select, Seat} when is_atom(select) ->
 			io:format("Buying a seat in the replica node~n"),
-			Check = maps:find({Seat}, ets:first(Table)),
+			CurrMap = ets:lookup_element(Table, map, 2),
+			%io:format("~w~n", [CurrMap]),
+			Check = maps:find({Seat}, CurrMap),
 			io:format("Checking if a seat is available in the replica node  ~w~n", [Check]),
 			
 			if  Check == {ok, {not_used}} ->
-				Map = maps:update({Seat}, {used}, ets:first(Table)),
-				%io:format("~n~w~n", [Map]),
-				ets:insert(Table, {Map}),
+				Map = maps:update({Seat}, {used},CurrMap),
+				Hash = ets:lookup_element(Table, hash, 2),
+				ets:insert(Table, [{map, Map}, {hash, Hash + 1}]),
 				Result = {noreply, State},
-				Disp_PID ! {Java_PID, selected, Map};
+				Disp_PID ! {Java_PID, ets:lookup_element(Table, hash, 2), selected, Map};
 				
 			true ->
 				Result = {noreply, State},	
-				Disp_PID ! {Java_PID, notSelected, ets:first(Table)}
+				Disp_PID ! {Java_PID, ets:lookup_element(Table, hash, 2), notSelected, ets:lookup_element(Table, map, 2)}
 								
 			end;
 	
 		{Disp_PID, Java_PID, unselect, Seat} when is_atom(unselect) ->
 			io:format("Buying a seat in the replica node~n"),
-			Check = maps:find({Seat}, ets:first(Table)),
+			Check = maps:find({Seat}, ets:lookup_element(Table, map, 2)),
 			io:format("Checking if a seat is available in the replica node  ~w~n", [Check]),
 			
 			if  Check == {ok, {used}} ->
-				Map = maps:update({Seat}, {not_used}, ets:first(Table)),
-				%io:format("~n~w~n", [Map]),
-				ets:insert(Table, {Map}),
+				Map = maps:update({Seat}, {not_used}, ets:lookup_element(Table, map, 2)),
+				Hash = ets:lookup_element(Table, hash, 2),
+				ets:insert(Table, [{map, Map}, {hash, Hash + 1}]),
 				Result = {noreply, State},
-				Disp_PID ! {Java_PID, unselected, Map};
+				Disp_PID ! {Java_PID, ets:lookup_element(Table, hash, 2), unselected, Map};
 				
 			true ->
 				Result = {noreply, State},	
-				Disp_PID ! {Java_PID, notUnselected, ets:first(Table)}
+				Disp_PID ! {Java_PID, ets:lookup_element(Table, hash, 2), notUnselected, ets:lookup_element(Table, map, 2)}
 								
 			end;
 
 
 		{Disp_PID, Java_PID, show, Hash} when is_atom(show) ->
+			
 			io:format("View the map in the replica node~n"),
-			Result = {noreply, State},		
-			Disp_PID ! {Java_PID, ets:first(Table)};
+			NodeHash = ets:lookup_element(Table, hash, 2),
+			if Hash == NodeHash ->
+				Result = {noreply, State},
+				Disp_PID ! {Java_PID, ok_hash};
+			
+			true ->
+				Result = {noreply, State},
+				Disp_PID ! {Java_PID, show, ets:lookup_element(Table, map, 2), Hash, ets:lookup_element(Table, nRows, 2), ets:lookup_element(Table, nCols, 2), ets:lookup_element(Table, price, 2)}
+
+			end;
+					
+			
 		
 		
 		{Disp_PID, Java_PID, _} ->
@@ -143,7 +105,6 @@ handle_call(Request, From, State = #state{tbl = Table}) ->
 
 		
 	end,
-    Result = {noreply, State},
     %io:format("handle_call: ~p~n", [Reply]),
     Result.
 

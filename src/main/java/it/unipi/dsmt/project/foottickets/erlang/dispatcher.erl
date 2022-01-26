@@ -56,24 +56,7 @@ handle_info(Info, State) ->
 	%io:format("Info: ~w  State: ~w~n", [Info, State]),
 	case Info of 
 
-		%%requests from java
-		%%v1
-		{Java_PID, create, Map} when is_atom(create) ->
-			io:format("You are creating a map~n"),
-			catch gen_server:call({replica,replica@localhost}, {self(), Java_PID, create, Map}, 1),
-			{noreply, State};
-			
-		{Java_PID, isAvailable, Seat} when is_atom(isAvailable) ->
-			catch gen_server:call({replica,replica@localhost}, {self(), Java_PID, isAvailable, Seat}, 1),
-			{noreply, State};
-			
-		{Java_PID, buy, Seat} when is_atom(buy) ->
-			catch gen_server:call({replica,replica@localhost}, {self(), Java_PID, buy, Seat}, 1),
-			{noreply, State};
-			
-		{Java_PID, view} when is_atom(view) ->
-			catch gen_server:call({replica,replica@localhost}, {self(), Java_PID, view}, 1),
-			{noreply, State};
+		%%requests from java	
 		
 		%%v2
 		{Java_PID, create, NRows, NCols, Price, Map} when is_atom(create) ->
@@ -94,32 +77,6 @@ handle_info(Info, State) ->
 			{noreply, State};
 
 		%%Answers to java
-		%%v1
-		{Java_PID, created} when is_atom(created) ->
-			io:format("Created Reply~n"),
-			Java_PID ! {"Map created"},
-			{noreply, State};
-			
-		{Java_PID, isAvailable} when is_atom(isAvailable) ->
-			io:format("isAvailable Reply~n"),
-			Java_PID ! {"The seat is available"},
-			{noreply, State};
-			
-		{Java_PID, notAvailable} when is_atom(notAvailable) ->
-			io:format("notAvailable Reply~n"),
-			Java_PID ! {"The seat is not available"},
-			{noreply, State};
-			
-		{Java_PID, bought} when is_atom(bought) ->
-			io:format("bought Reply~n"),
-			Java_PID ! {"The seat has been bought"},
-			{noreply, State};
-		
-		{Java_PID, Map} when is_atom(bought) ->
-			io:format("view Reply~n"),
-			Java_PID ! {Map},
-			{noreply, State};
-
 		%%v2
 		{Java_PID, created, Hash} when is_atom(created) ->
 			io:format("Created Reply~n"),
@@ -131,24 +88,34 @@ handle_info(Info, State) ->
 			Java_PID ! {no_ok, "Map already exist"},
 			{noreply, State};
 
-		{Java_PID, selected, Map} when is_atom(selected) ->
-			io:format("selected Reply~n"),
-			Java_PID ! {ok, "The seat has been selected", Map},
+		{Java_PID, show, Map, Hash, NRows, NCols, Price} when is_atom(show) ->
+			io:format("showMap Reply~n"),
+			Java_PID ! {ok, Hash, NRows, NCols, Price, Map},
+			{noreply, State};
+	
+		{Java_PID, ok_hash} when is_atom(ok_hash) ->
+			io:format("okhash Reply~n"),
+			Java_PID ! {ok_hash},
 			{noreply, State};
 
-		{Java_PID, notSelected, Map} when is_atom(notSelected) ->
+		{Java_PID, Hash, selected, Map} when is_atom(selected) ->
+			io:format("selected Reply~n"),
+			Java_PID ! {ok, Hash, "The seat has been selected", Map},
+			{noreply, State};
+
+		{Java_PID, Hash, notSelected, Map} when is_atom(notSelected) ->
 			io:format("notSelected Reply~n"),
-			Java_PID ! {no_ok, "The seat has not been selected", Map},
+			Java_PID ! {no_ok, Hash, "The seat has not been selected", Map},
 			{noreply, State};
 		
-		{Java_PID, unselected, Map} when is_atom(selected) ->
+		{Java_PID, Hash, unselected, Map} when is_atom(selected) ->
 			io:format("unselected Reply~n"),
-			Java_PID ! {ok, "The seat has been unselected", Map},
+			Java_PID ! {ok, Hash, "The seat has been unselected", Map},
 			{noreply, State};
 		
-		{Java_PID, notUnselected, Map} when is_atom(notUnselected) ->
+		{Java_PID, Hash, notUnselected, Map} when is_atom(notUnselected) ->
 			io:format("notUnselected Reply~n"),
-			Java_PID ! {no_ok, "The seat has not been unselected", Map},
+			Java_PID ! {no_ok, Hash, "The seat has not been unselected", Map},
 			{noreply, State};
 
 		{Java_PID, _} ->
