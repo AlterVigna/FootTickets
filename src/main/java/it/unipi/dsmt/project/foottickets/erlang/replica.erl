@@ -25,7 +25,7 @@ handle_call(Request, From, State = #state{tbl = Table}) ->
 		%%v2
 
 		{Disp_PID, Java_PID, create, NRows, NCols, Price, Map} when is_atom(create) ->
-			AlreadyExist = ets:member(Table, Map),
+			AlreadyExist = ets:member(Table, map),
 			io:format("Creating a map in the replica node~w~n", [AlreadyExist]),
 			if AlreadyExist == false ->
 				Hash = 0,

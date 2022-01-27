@@ -11,9 +11,8 @@ start_link() ->
     Return.
 
 init([]) ->
-    State = [],
-    Return = {ok, State},
-    io:format("init: ~p~n", [State]),
+    Return = {ok, []},
+    io:format("init:~n"),
     Return.
 
 handle_call(Request, From, State) ->
@@ -36,7 +35,8 @@ handle_call(Request, From, State) ->
 			gen_server:call(replica, {create}, 1),
 			Reply = Request,
     		NewState = State,
-			Result = {reply, Reply, NewState};	
+			Result = {reply, Reply, NewState};
+
 			
 					
 		_->
@@ -61,19 +61,19 @@ handle_info(Info, State) ->
 		%%v2
 		{Java_PID, create, NRows, NCols, Price, Map} when is_atom(create) ->
 			io:format("You are creating a map~n"),
-			catch gen_server:call({replica,replica@localhost}, {self(), Java_PID, create, NRows, NCols, Price, Map}, 1),
+			catch gen_server:call({replica, replica@localhost}, {self(), Java_PID, create, NRows, NCols, Price, Map}, 1),
 			{noreply, State};
 
 		{Java_PID, select, Seat} when is_atom(select) ->
-			catch gen_server:call({replica,replica@localhost}, {self(), Java_PID, select, Seat}, 1),
+			catch gen_server:call({replica, replica@localhost}, {self(), Java_PID, select, Seat}, 1),
 			{noreply, State};
 
 		{Java_PID, unselect, Seat} when is_atom(unselect) ->
-			catch gen_server:call({replica,replica@localhost}, {self(), Java_PID, unselect, Seat}, 1),
+			catch gen_server:call({replica, replica@localhost}, {self(), Java_PID, unselect, Seat}, 1),
 			{noreply, State};
 
 		{Java_PID, show, Hash} when is_atom(show) ->
-			catch gen_server:call({replica,replica@localhost}, {self(), Java_PID, show, Hash}, 1),
+			catch gen_server:call({replica, replica@localhost}, {self(), Java_PID, show, Hash}, 1),
 			{noreply, State};
 
 		%%Answers to java
