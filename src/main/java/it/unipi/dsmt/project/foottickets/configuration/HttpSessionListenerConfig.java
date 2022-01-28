@@ -2,13 +2,18 @@ package it.unipi.dsmt.project.foottickets.configuration;
 
 import it.unipi.dsmt.project.foottickets.erlangInterfaces.DispatcherInterface;
 
+import it.unipi.dsmt.project.foottickets.model.Account;
+import it.unipi.dsmt.project.foottickets.model.TempTransaction;
+import it.unipi.dsmt.project.foottickets.service.ITempTransactionService;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -58,8 +63,9 @@ public class HttpSessionListenerConfig implements HttpSessionListener {
         // Another way to retrieve bean inside the application context.
         WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(sessionEvent.getSession().getServletContext());
         DispatcherInterface di = (DispatcherInterface) context.getBean("dispatcherInterface");
+        ITempTransactionService itts= (ITempTransactionService) context.getBean("mainTempTransactionService");
 
-        
+        Account username= (Account) sessionEvent.getSession().getAttribute(KEY_CURRENT_USER);
         Set<String> selectedPlaces = (Set<String>) sessionEvent.getSession().getAttribute(KEY_SELECTED_SEATS);
         if (selectedPlaces!=null){
             for (String selPlace: selectedPlaces) {
@@ -76,6 +82,10 @@ public class HttpSessionListenerConfig implements HttpSessionListener {
             }
         }
 
+        Optional<TempTransaction> tempTrans = itts.findTempTransactionAccount(username.getUsername());
+        if (tempTrans.isPresent()){
+            itts.removeTempTransaction(tempTrans.get());
+        }
         activeSessions.decrementAndGet();
         sessionEvent.getSession().setAttribute("activeSessions", activeSessions.get());
         System.out.println("Session Destroyed!");

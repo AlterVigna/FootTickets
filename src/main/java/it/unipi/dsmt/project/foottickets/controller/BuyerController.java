@@ -2,8 +2,10 @@ package it.unipi.dsmt.project.foottickets.controller;
 
 import it.unipi.dsmt.project.foottickets.erlangInterfaces.DispatcherInterface;
 import it.unipi.dsmt.project.foottickets.model.Account;
+import it.unipi.dsmt.project.foottickets.model.TempTransaction;
 import it.unipi.dsmt.project.foottickets.model.Transaction;
 import it.unipi.dsmt.project.foottickets.service.IAccountService;
+import it.unipi.dsmt.project.foottickets.service.ITempTransactionService;
 import it.unipi.dsmt.project.foottickets.service.ITransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,10 +39,28 @@ public class BuyerController {
     @Qualifier("mainTransactionService")
     ITransactionService transactionService;
 
+    @Autowired
+    @Qualifier("mainTempTransactionService")
+    ITempTransactionService iTempTransactionService;
 
     @GetMapping("")
     public String buyer(HttpServletRequest request, Principal principal){
         Optional<Account> user = accountService.findByUsername(principal.getName());
+
+        /* if some place was selected before by this user, now it is restored. */
+        Optional<TempTransaction> tempTrans = iTempTransactionService.findTempTransactionAccount(user.get().getUsername());
+        if (tempTrans.isPresent()){
+            String loc=tempTrans.get().getLocation();
+            String[] splitted = loc.split(";");
+            Set<String> selectedPlaces=new HashSet<>();
+            if (splitted!=null){
+                for (String place: splitted) {
+                    selectedPlaces.add(place);
+                }
+            }
+            request.getSession().setAttribute(KEY_SELECTED_SEATS,selectedPlaces);
+        }
+
         request.getSession().setAttribute(KEY_CURRENT_USER,user.get());
         return HOME_BUYER_PAGE;
     }
@@ -100,12 +121,16 @@ public class BuyerController {
         transaction.setNumSeats(numPlaces);
         transaction.setLocation(location);
         transaction.setPrice(numPlaces*seatPrice.doubleValue());
-        transaction.setTimestamp(null); // This will be insert automatically by db.
+        transaction.setTimestamp(null); // This will be inserted automatically by db.
         transaction.setAccount(account);
 
         // This method is a transactional so all the checks are repeated inside.
         try {
             transactionService.saveTransactionAndUpdateAccount(transaction,account);
+            Optional<TempTransaction> tempTrans = iTempTransactionService.findTempTransactionAccount(account.getUsername());
+            if (tempTrans.isPresent()){
+                iTempTransactionService.removeTempTransaction(tempTrans.get());
+            }
         } catch (Exception e) {
             return  "redirect:"+HOME_BUYER+"/buyTicket?errorDuringSave="+true;
         }

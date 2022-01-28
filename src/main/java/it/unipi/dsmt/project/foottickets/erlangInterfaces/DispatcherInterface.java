@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static it.unipi.dsmt.project.foottickets.configuration.GlobalConfiguration.*;
@@ -29,19 +27,25 @@ public class DispatcherInterface {
     private static Random randomGenerator;
 
     private final String cookie;
-    private final List<String> dispatcherNodeNames= new ArrayList<>();
+    private final Set<String> dispatcherNodeNames= new HashSet<>();
+    private final Set<String> dispatcherNodesAvailables=new HashSet<>();
+
     private final String clientNodeName;
     private static OtpNode clientNode;
 
     private final String recipientMailBox;
     private static final AtomicInteger counter= new AtomicInteger(0); //shared counter
+    private final  Long MAX_ATTEMPTS;
+    private final  Long MAX_TIMEOUT;
 
     private MapState mapState; // Used for caching.
 
     private DispatcherInterface(@Value("${erlang.cookie}") String cookie,
                                 @Value("${erlang.dispatchersListName}") String dispatcherStringListName,
                                 @Value("${erlang.clientNodeName}") String clientNodeName,
-                                @Value("${erlang.recipientMailBoxName}") String recipientMailBoxName
+                                @Value("${erlang.recipientMailBoxName}") String recipientMailBoxName,
+                                @Value("${erlang.maxAttempts}") Long maxAttempts,
+                                @Value("${erlang.maxTimeout}") Long maxTimeOut
                                 ) throws IOException {
         this.cookie=cookie;
         this.clientNodeName = clientNodeName;
@@ -57,8 +61,12 @@ public class DispatcherInterface {
             this.clientNode = new OtpNode(clientNodeName);
         }
 
+        this.MAX_ATTEMPTS=maxAttempts;
+        this.MAX_TIMEOUT=maxTimeOut;
+
         randomGenerator=new Random();
         mapState=new MapState();
+        initializeDispatcherNodeAvailables();
     }
 
     private void initializeDispatcherNodeNames(String listOfDispatcher){
@@ -72,14 +80,6 @@ public class DispatcherInterface {
             dispatcherNodeNames.add(dispatcherName);
             System.out.println(dispatcherName);
         }
-    }
-
-
-
-
-    public String getRandomDispatcher(){
-        int index = randomGenerator.nextInt(dispatcherNodeNames.size());
-        return dispatcherNodeNames.get(index);
     }
 
 
@@ -100,13 +100,11 @@ public class DispatcherInterface {
         OtpErlangObject msg= null;
 
         JSONObject response = null;
-        serverNodeName = "dispatcher_0@localhost";//getRandomDispatcher();
-        mailBoxRecipient = getRecipientMailBox();
-        
+
         switch (op) {
 
             case JS_OP_CODE_CREATE_MAP:
-                response=createMapProtocol(mbox,request_body,mailBoxRecipient,serverNodeName);
+                response=createMapProtocol(mbox,request_body);
                 break;
 
             case JS_OP_CODE_SELECT_PLACE:
@@ -129,18 +127,19 @@ public class DispatcherInterface {
 
 
 
-    public JSONObject createMapProtocol(OtpMbox mbox, JSONObject request_body, String mailBoxRecipient, String serverNodeName) throws JSONException, OtpErlangDecodeException, OtpErlangExit {
+    public JSONObject createMapProtocol(OtpMbox mbox, JSONObject request_body) throws JSONException, OtpErlangDecodeException, OtpErlangExit {
 
         OtpErlangTuple erlangMsg = DispatcherConversionUtilities.createMapErlangRequest(mbox.self(), request_body);
 
-        mbox.send(mailBoxRecipient,serverNodeName, erlangMsg);
-        System.out.println("Request sent .. Wait for an answer.");
+        OtpErlangObject msg = basicErlangSendReceiveProtocol(mbox, erlangMsg);
+        if (msg==null){
+            JSONObject response =new JSONObject();
+            response.put("answer",NEGATIVE_ANSWER);
+            response.put("msg","Connection timeout! Try again later!");
+            return response;
+        }
 
-        //blocking receive operation
-        OtpErlangObject msg = mbox.receive();
-        //Here put the timeout and repeting of request.
         JSONObject response = DispatcherConversionUtilities.answerCreateMapFromErlang((OtpErlangTuple) msg);
-
         System.out.println("Answer received " + response.toString());
 
         return response;
@@ -151,11 +150,13 @@ public class DispatcherInterface {
     public JSONObject selectDeselectProtocol( OtpMbox mbox, JSONObject request_body, String mailBoxRecipient, String serverNodeName) throws JSONException, OtpErlangDecodeException, OtpErlangExit {
 
         OtpErlangTuple erlangMsg = DispatcherConversionUtilities.selectDeselectErlangRequest(mbox.self(), request_body);
-        mbox.send(mailBoxRecipient,serverNodeName, erlangMsg);
-        System.out.println("Request sent .. Wait for an answer.");
-        
-        //blocking receive operation
-        OtpErlangObject msg = mbox.receive();
+        OtpErlangObject msg = basicErlangSendReceiveProtocol(mbox, erlangMsg);
+        if (msg==null){
+            JSONObject response =new JSONObject();
+            response.put("answer",NEGATIVE_ANSWER);
+            response.put("msg","Connection timeout! Try again later!");
+            return response;
+        }
         JSONObject response = DispatcherConversionUtilities.answerSelectDeselectFromErlang((OtpErlangTuple) msg);
         System.out.println("Answer received " + response.toString());
         
@@ -175,12 +176,13 @@ public class DispatcherInterface {
         }
 
         OtpErlangTuple erlangMsg = DispatcherConversionUtilities.showMapErlangRequest(mbox.self(), hash);
-        mbox.send(mailBoxRecipient, serverNodeName, erlangMsg);
-
-        System.out.println("Request sent by " + clientNodeName + " the following tuple: " + erlangMsg.toString());
-
-        //blocking receive operation
-        OtpErlangObject msg = mbox.receive();
+        OtpErlangObject msg = basicErlangSendReceiveProtocol(mbox, erlangMsg);
+        if (msg==null){
+            JSONObject response =new JSONObject();
+            response.put("answer",NEGATIVE_ANSWER);
+            response.put("msg","Connection timeout! Try again later!");
+            return response;
+        }
         JSONObject response = DispatcherConversionUtilities.answerShowMapFromErlang((OtpErlangTuple) msg);
 
         //Maybe here consider the possibility to store an hash of the entire map.
@@ -188,38 +190,84 @@ public class DispatcherInterface {
         
         return response;
     }
-    
-    
-    
-    
-    
-    
-    public String getCookie() {
-        return cookie;
+
+
+    /**
+     * The basic idea is the following: each time we send a request to a dispatcher we repeat that request at least MAX_ATTEMPTS
+     * unless the answer is not null. If it reaches MAX_ATTEMPTS, we sign that that dispatcher is not available and it tries another one.
+     * @param mbox
+     * @param erlangMsg
+     * @return
+     * @throws OtpErlangDecodeException
+     * @throws OtpErlangExit
+     */
+    private OtpErlangObject basicErlangSendReceiveProtocol(OtpMbox mbox,OtpErlangTuple erlangMsg) throws OtpErlangDecodeException, OtpErlangExit {
+
+        OtpErlangObject msg=null;
+
+        if(!isSomeDispatcherAvailable()){
+            initializeDispatcherNodeAvailables();
+        }
+
+        while (isSomeDispatcherAvailable() && msg==null){
+            int trials=0;
+            String serverNodeName= getRandomDispatcherAvailable();
+            System.out.println("Selected dispatcherNode: "+serverNodeName);
+            while (!"".equals(serverNodeName) && msg==null && trials<MAX_ATTEMPTS ){
+
+                System.out.println("Try to send msg trial nr: "+(trials+1));
+                trials++;
+
+                mbox.send(recipientMailBox,serverNodeName, erlangMsg);
+                System.out.println("Request sent .. Wait for an answer.");
+
+                //blocking receive operation
+                msg = mbox.receive(MAX_TIMEOUT);
+                System.out.println("Msg received .. "+msg);
+
+            }
+            if (trials==MAX_ATTEMPTS){
+                System.out.println("Probably dispatcher "+serverNodeName + "is dead. Removed from list.");
+                removeDispatcherFromList(serverNodeName);
+            }
+        }
+
+        return msg;
     }
 
-    public List<String> getDispatcherNodeNames() {
-        return dispatcherNodeNames;
-    }
 
-    public OtpNode getClientNode() {
-        return clientNode;
-    }
-
-    public String getRecipientMailBox() {
-        return recipientMailBox;
-    }
-
-    public String getClientNodeName() {
-        return clientNodeName;
-    }
 
     public MapState getMapState() {
         return mapState;
     }
 
-    public void setMapState(MapState mapState) {
-        this.mapState = mapState;
+
+
+    private synchronized void initializeDispatcherNodeAvailables(){
+        if (clientNode==null || dispatcherNodeNames.size()==dispatcherNodesAvailables.size()) return;
+        for (String dispatcherName:dispatcherNodeNames){
+            if (clientNode.ping(dispatcherName, MAX_TIMEOUT)){
+                dispatcherNodesAvailables.add(dispatcherName);
+            }
+        }
     }
+
+    private synchronized String getRandomDispatcherAvailable(){
+        if (isSomeDispatcherAvailable()){
+            int index = randomGenerator.nextInt(dispatcherNodesAvailables.size());
+            return (String)(dispatcherNodesAvailables.toArray())[index];
+        }
+        return "";
+    }
+
+    private synchronized void removeDispatcherFromList(String dispatcherName){
+        dispatcherNodesAvailables.remove(dispatcherName);
+    }
+
+    public synchronized boolean isSomeDispatcherAvailable(){
+        return !dispatcherNodesAvailables.isEmpty();
+    }
+
+
 
 }

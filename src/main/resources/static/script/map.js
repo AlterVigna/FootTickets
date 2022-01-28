@@ -22,7 +22,7 @@ $( document ).ready(function() {
         if (auth==undefined || auth.trim()==""){
             auth='none';
         }
-
+        $(".container").append("<span id='msgLoad'> Loading the map ...</span> ");
         AJAX_CALL_READ_MAP_STATUS(auth);
     }
 
@@ -204,6 +204,12 @@ function removeHiddenElement(elem){
         $.get( path, {  })
             .done(function( JSON_ANSWER ) {
 
+                $("#msgLoad").remove();
+                answer=JSON_ANSWER["answer"];
+                if (answer!="1"){
+                    alert(JSON_ANSWER["messageDescription"])
+                    // alert(" Hey someone has reserved that seat before you. Please select an other one!")
+                }
                 numRows=JSON_ANSWER["numRows"];
                 numCols=JSON_ANSWER["numCols"];
                 price=JSON_ANSWER["price"];
@@ -232,7 +238,8 @@ function removeHiddenElement(elem){
             .done(function( JSON_ANSWER ) {
                 answer=JSON_ANSWER["answer"];
                 if (answer!="1"){
-                    alert(" Hey someone has reserved that seat before you. Please select an other one!")
+                    alert(JSON_ANSWER["messageDescription"])
+                   // alert(" Hey someone has reserved that seat before you. Please select an other one!")
                 }
                 numRows=JSON_ANSWER["numRows"];
                 numCols=JSON_ANSWER["numCols"];

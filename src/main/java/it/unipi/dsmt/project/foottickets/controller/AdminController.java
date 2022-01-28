@@ -67,6 +67,7 @@ public class AdminController {
         JSONObject requestJson=null;
         JSONObject responseJson=null;
         boolean outcome=true;
+        String optionalMsg="";
 
         try {
             requestJson = mapForm.toJSON();
@@ -85,6 +86,8 @@ public class AdminController {
                     //request.getSession().setAttribute(KEY_SELECTED_SEATS,mapForm.getSelectedPlaces());
                 }
                 else{
+                    optionalMsg=responseJson.getString("msg");
+                    System.out.println(responseJson.getString("msg"));
                     outcome = false;
                 }
             }
@@ -93,7 +96,7 @@ public class AdminController {
             outcome = false;
         }
 
-        return  "redirect:"+HOME_ADMIN+"?mapCreated="+outcome;
+        return  "redirect:"+HOME_ADMIN+"?mapCreated="+outcome+"&optionalMsg="+optionalMsg;
     }
 
 

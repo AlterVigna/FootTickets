@@ -49,16 +49,16 @@ public class HomeController {
 
     @PostMapping(value = "/signIn")
     public String signIn(HttpServletRequest request, @ModelAttribute("account") Account account){
-        boolean esit =false;
+        boolean outcome =false;
         account.setAmount(DEFAULT_NEW_AMOUNT);
         // Maybe some further control next..
         if ("".equals(account.getUsername().trim())){
-            esit=false;
+            outcome=false;
         }
         else {
-            esit = accountService.saveNewAccount(account);
+            outcome = accountService.saveNewAccount(account);
         }
-        return "redirect:"+LOGIN_CALL+"?registrationOk="+esit;
+        return "redirect:"+LOGIN_CALL+"?registrationOk="+outcome;
     }
 
     @GetMapping("/login")
