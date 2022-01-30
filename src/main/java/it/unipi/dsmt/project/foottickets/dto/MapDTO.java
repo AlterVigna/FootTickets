@@ -3,10 +3,15 @@ package it.unipi.dsmt.project.foottickets.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+
+import static it.unipi.dsmt.project.foottickets.configuration.GlobalConfiguration.ERL_OP_CODE_CREATE_MAP;
 
 
 /**
@@ -37,6 +42,41 @@ public class MapDTO implements Serializable {
 
     int responseCode;
     String messageDescription;
+
+
+    public JSONObject toJSON() throws JSONException {
+
+        JSONObject jo = new JSONObject();
+        jo.put("answer",answer);
+        if (numRows.intValue()!=0){
+            jo.put("numRows", numRows.intValue());
+        }
+        if (numCols.intValue()!=0){
+            jo.put("numCols", numCols.intValue());
+        }
+        if (price.intValue()!=0){
+            jo.put("price", price.intValue());
+        }
+
+        JSONArray jArray = new JSONArray();
+
+        for (String selPlace: lockedPlaces) {
+            jArray.put(selPlace);
+        }
+        jo.put("lockedPlaces",jArray);
+
+        JSONArray jArray2 = new JSONArray();
+
+        for (String selPlace: currentSelectedPlaces) {
+            jArray2.put(selPlace);
+        }
+        jo.put("currentSelectedPlaces",jArray2);
+
+        jo.put("responseCode", responseCode);
+        jo.put("messageDescription", messageDescription);
+
+        return jo;
+    }
 
 
 }

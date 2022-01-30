@@ -48,7 +48,7 @@ public class HomeController {
     }
 
     @PostMapping(value = "/signIn")
-    public String signIn(HttpServletRequest request, @ModelAttribute("account") Account account){
+    public String signIn(@ModelAttribute("account") Account account){
         boolean outcome =false;
         account.setAmount(DEFAULT_NEW_AMOUNT);
         // Maybe some further control next..

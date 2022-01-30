@@ -21,7 +21,7 @@ public class MapState {
     private Set<String> lockedPlaces;
 
 
-    MapState(){
+    public MapState(){
         this.hash="-1";
         this.numRows=0L;
         this.numCols=0L;

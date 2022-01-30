@@ -159,11 +159,18 @@ public static JSONObject answerCreateMapFromErlang (OtpErlangTuple msgReply){
     OtpErlangAtom ErlAnswer = (OtpErlangAtom) msgReply.elementAt(0);
     answer=ErlAnswer.atomValue();
 
-    OtpErlangLong ErlHash = (OtpErlangLong) msgReply.elementAt(1);
-    hash=ErlHash.longValue();
+    if (ERL_NEG_ANSWER.equals(answer)){
+        OtpErlangString ErlMsg = (OtpErlangString) msgReply.elementAt(1);
+        msg=ErlMsg.stringValue();
 
-    OtpErlangString ErlMsg = (OtpErlangString) msgReply.elementAt(2);
-    msg=ErlMsg.stringValue();
+    }
+    else {
+        OtpErlangLong ErlHash = (OtpErlangLong) msgReply.elementAt(1);
+        hash=ErlHash.longValue();
+
+        OtpErlangString ErlMsg = (OtpErlangString) msgReply.elementAt(2);
+        msg=ErlMsg.stringValue();
+    }
 
 
     if (ERL_POS_ANSWER.equals(answer)){

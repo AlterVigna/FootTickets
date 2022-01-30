@@ -17,6 +17,12 @@ public class SeatInfo implements Serializable {
     public String operation;
     public String placeSelected;
 
+
+    public SeatInfo(String op,String placeSel){
+        this.operation=op;
+        this.placeSelected=placeSel;
+    }
+
     public JSONObject toJSON() throws JSONException {
         JSONObject jo = new JSONObject();
         jo.put("operation", operation);

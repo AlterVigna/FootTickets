@@ -43,6 +43,8 @@ public class BuyerController {
     @Qualifier("mainTempTransactionService")
     ITempTransactionService iTempTransactionService;
 
+
+
     @GetMapping("")
     public String buyer(HttpServletRequest request, Principal principal){
         Optional<Account> user = accountService.findByUsername(principal.getName());
@@ -78,8 +80,7 @@ public class BuyerController {
 
 
     @GetMapping("/buyTicket")
-    public String buyTicketMap(HttpServletRequest request){
-
+    public String buyTicketMap(){
         return BUY_TICKET_VIEW;
     }
 

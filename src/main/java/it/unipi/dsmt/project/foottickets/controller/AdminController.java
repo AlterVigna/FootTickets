@@ -40,7 +40,7 @@ public class AdminController {
     }
 
     @GetMapping("/createMap")
-    public String createMap(HttpServletRequest request, Model model){
+    public String createMap(Model model){
 
         CreateMapDTO mapForm= new CreateMapDTO();
         mapForm.setNumRows(1L);
@@ -52,7 +52,7 @@ public class AdminController {
     }
 
     @PostMapping("/confirmMap")
-    public String confirmMap(HttpServletRequest request, @ModelAttribute("map") CreateMapDTO mapForm ){
+    public String confirmMap(@ModelAttribute("map") CreateMapDTO mapForm ){
 
         System.out.println("Num Rows : "+ mapForm.getNumRows() );
         System.out.println("Num Cols : "+ mapForm.getNumCols() );
