@@ -15,7 +15,7 @@ start_link() ->
 
 init([]) ->
     Table = ets:new(test, []),
-	catch gen_server:call({replica_bu, replica_bu@localhost}, {self(), getTableInfo}),
+	catch gen_server:cast({replica_bu, replica_bu@localhost}, {self(), getTableInfo}),
     Return = {ok, #state{tbl = Table}},
     io:format("init: ~n"),
     Return.
@@ -27,13 +27,13 @@ handle_call(Request, From, State = #state{tbl = Table}) ->
 
 		{Disp_PID, Java_PID, create, NRows, NCols, Price, Map} when is_atom(create) ->
 			AlreadyExist = ets:member(Table, map),
-			io:format("Creating a map in the replica node~w~n", [AlreadyExist]),
+			io:format("Creating a map in the replica node~p~n", [AlreadyExist]),
 			if AlreadyExist == false ->
 				Hash = 0,
 				ets:insert(Table, [{map, Map}, {hash, Hash}, {nRows, NRows}, {nCols, NCols}, {price, Price}]),
-				io:format("~w~n", [ets:lookup(Table, map)]),
+				io:format("~p~n", [ets:lookup(Table, map)]),
 				Result = {noreply, State},
-				catch gen_server:call({replica_bu, replica_bu@localhost}, {createTable, ets:lookup_element(Table, map, 2), ets:lookup_element(Table, hash, 2), ets:lookup_element(Table, nRows, 2), ets:lookup_element(Table, nCols, 2), ets:lookup_element(Table, price, 2)}),
+				catch gen_server:cast({replica_bu, replica_bu@localhost}, {createTable, ets:lookup_element(Table, map, 2), ets:lookup_element(Table, hash, 2), ets:lookup_element(Table, nRows, 2), ets:lookup_element(Table, nCols, 2), ets:lookup_element(Table, price, 2)}),
 				Disp_PID ! {Java_PID, created, Hash};
 				
 			true ->
@@ -53,7 +53,7 @@ handle_call(Request, From, State = #state{tbl = Table}) ->
 				Hash = ets:lookup_element(Table, hash, 2),
 				ets:insert(Table, [{map, Map}, {hash, Hash + 1}]),
 				Result = {noreply, State},
-				catch gen_server:call({replica_bu, replica_bu@localhost}, {createTable, ets:lookup_element(Table, map, 2), ets:lookup_element(Table, hash, 2), ets:lookup_element(Table, nRows, 2), ets:lookup_element(Table, nCols, 2), ets:lookup_element(Table, price, 2)}),
+				catch gen_server:cast({replica_bu, replica_bu@localhost}, {createTable, ets:lookup_element(Table, map, 2), ets:lookup_element(Table, hash, 2), ets:lookup_element(Table, nRows, 2), ets:lookup_element(Table, nCols, 2), ets:lookup_element(Table, price, 2)}),
 				Disp_PID ! {Java_PID, ets:lookup_element(Table, hash, 2), selected, Map};
 				
 			true ->
@@ -72,7 +72,7 @@ handle_call(Request, From, State = #state{tbl = Table}) ->
 				Hash = ets:lookup_element(Table, hash, 2),
 				ets:insert(Table, [{map, Map}, {hash, Hash + 1}]),
 				Result = {noreply, State},
-				catch gen_server:call({replica_bu, replica_bu@localhost}, {createTable, ets:lookup_element(Table, map, 2), ets:lookup_element(Table, hash, 2), ets:lookup_element(Table, nRows, 2), ets:lookup_element(Table, nCols, 2), ets:lookup_element(Table, price, 2)}),
+				catch gen_server:cast({replica_bu, replica_bu@localhost}, {createTable, ets:lookup_element(Table, map, 2), ets:lookup_element(Table, hash, 2), ets:lookup_element(Table, nRows, 2), ets:lookup_element(Table, nCols, 2), ets:lookup_element(Table, price, 2)}),
 				Disp_PID ! {Java_PID, ets:lookup_element(Table, hash, 2), unselected, Map};
 				
 			true ->
@@ -118,7 +118,7 @@ handle_cast(_Msg, State) ->
     Return.
 
 handle_info(Info, State = #state{tbl = Table}) ->
-	io:format("Info: ~w  State: ~w~n", [Info, State]),
+	io:format("Info: ~p  State: ~w~n", [Info, State]),
 	case Info of 
 		{create} when is_atom(create) ->
 			io:format("This is a test~n"),

@@ -41,10 +41,26 @@ handle_call(Request, From, State = #state{tbl = Table}) ->
     end,    
     Result.
 
-handle_cast(_Msg, State) ->
-    Return = {noreply, State},
-    io:format("handle_cast: ~p~n", [Return]),
-    Return.
+handle_cast(Request, State = #state{tbl = Table}) ->
+    case Request of		
+		{RepPID, getTableInfo} ->
+            io:format("~w ~n", [ets:member(Table, map)]),
+            MapExist = ets:member(Table, map),
+            
+            if MapExist == false ->
+                RepPID ! {tableDontExist};              
+            true ->
+                RepPID ! {ets:lookup_element(Table, map, 2), ets:lookup_element(Table, hash, 2), ets:lookup_element(Table, nRows, 2), ets:lookup_element(Table, nCols, 2), ets:lookup_element(Table, price, 2)}
+            end,
+            Result = {noreply, State};
+        {createTable, Map, Hash, NRows, NCols, Price} ->
+            ets:insert(Table, [{map, Map}, {hash, Hash}, {nRows, NRows}, {nCols, NCols}, {price, Price}]),
+            Result = {noreply, State};
+        _ ->
+            Result = {noreply, State},
+            io:format("error")
+    end,    
+    Result.
 
 handle_info(Info, State) ->
 	io:format("Info: ~w  State: ~w~n", [Info, State]),
